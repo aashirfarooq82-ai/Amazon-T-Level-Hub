@@ -1,31 +1,30 @@
 /**
- * Database module - SQLite3 configuration and initialization
+ * Database module - Turso (libSQL) configuration and initialization
  * Implements secure database practices
+ *
+ * Replaces local SQLite file storage with hosted, persistent Turso database.
+ * Function interface (runAsync, allAsync, getAsync) is unchanged, so
+ * the rest of the app does not need to be modified.
  */
-
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-
-const DB_PATH = path.join(__dirname, 'tlevels.db');
-
-// Initialize database connection
-const db = new sqlite3.Database(DB_PATH, (err) => {
-  if (err) {
-    console.error('Error opening database:', err);
-  } else {
-    console.log('Connected to SQLite database');
-    initializeTables();
-  }
+ 
+const { createClient } = require('@libsql/client');
+require('dotenv').config();
+ 
+// Connect to Turso using env vars (set these in Render's Environment tab,
+// NOT in this file, and NOT committed to GitHub)
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
 });
-
+ 
 /**
  * Initialize database tables with proper schema
  * Uses parameterized queries to prevent SQL injection
  */
-function initializeTables() {
-  db.serialize(() => {
+async function initializeTables() {
+  try {
     // Contact submissions table
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS contacts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
@@ -38,16 +37,16 @@ function initializeTables() {
         CONSTRAINT email_format CHECK(email LIKE '%@%.%')
       )
     `);
-
+ 
     // Migration: Add name column to contacts if it doesn't exist (for existing databases)
-    db.run(`ALTER TABLE contacts ADD COLUMN name TEXT`, function(err) {
-      if (err) {
-        // Column already exists - this is expected on fresh installs
-      }
-    });
-
+    try {
+      await db.execute(`ALTER TABLE contacts ADD COLUMN name TEXT`);
+    } catch (err) {
+      // Column already exists - this is expected on fresh installs
+    }
+ 
     // Interest registration table
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS registrations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT NOT NULL,
@@ -61,9 +60,9 @@ function initializeTables() {
         CONSTRAINT valid_audience CHECK(audience IN ('Student', 'Parent', 'Teacher', 'School Representative'))
       )
     `);
-
+ 
     // Audit log for security tracking
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS audit_logs (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         action TEXT NOT NULL,
@@ -72,9 +71,9 @@ function initializeTables() {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
     `);
-
+ 
     // Users table for authentication
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT NOT NULL UNIQUE,
@@ -88,9 +87,9 @@ function initializeTables() {
         CONSTRAINT valid_account_type CHECK(account_type IN ('Student', 'Parent', 'Teacher', 'School Representative'))
       )
     `);
-
+ 
     // 2FA codes for two-factor authentication
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS two_fa_codes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -100,9 +99,9 @@ function initializeTables() {
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
-
+ 
     // JWT tokens for session management
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS tokens (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -112,9 +111,9 @@ function initializeTables() {
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
-
+ 
     // Password reset tokens
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS password_resets (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -125,9 +124,9 @@ function initializeTables() {
         FOREIGN KEY (user_id) REFERENCES users(id)
       )
     `);
-
+ 
     // Favorites table for saving colleges/resources
-    db.run(`
+    await db.execute(`
       CREATE TABLE IF NOT EXISTS favorites (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
@@ -138,71 +137,71 @@ function initializeTables() {
         UNIQUE(user_id, item_type, item_id)
       )
     `);
-
+ 
     console.log('Database tables initialized');
-  });
+  } catch (err) {
+    console.error('Error initializing tables:', err);
+  }
 }
-
+ 
+// Run initialization once on startup
+initializeTables();
+ 
 /**
- * Execute query with proper error handling
+ * Execute query with proper error handling (INSERT/UPDATE/DELETE)
  * @param {string} sql - SQL query
  * @param {array} params - Query parameters
- * @returns {Promise} - Resolves with query result
+ * @returns {Promise} - Resolves with { id, changes }
  */
-function runAsync(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.run(sql, params, function(err) {
-      if (err) {
-        console.error('Database error:', err);
-        reject(err);
-      } else {
-        resolve({ id: this.lastID, changes: this.changes });
-      }
-    });
-  });
+async function runAsync(sql, params = []) {
+  try {
+    const result = await db.execute({ sql, args: params });
+    return {
+      id: result.lastInsertRowid ? Number(result.lastInsertRowid) : null,
+      changes: result.rowsAffected,
+    };
+  } catch (err) {
+    console.error('Database error:', err);
+    throw err;
+  }
 }
-
+ 
 /**
  * Execute select query
  * @param {string} sql - SQL query
  * @param {array} params - Query parameters
  * @returns {Promise} - Resolves with array of results
  */
-function allAsync(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.all(sql, params, (err, rows) => {
-      if (err) {
-        console.error('Database error:', err);
-        reject(err);
-      } else {
-        resolve(rows || []);
-      }
-    });
-  });
+async function allAsync(sql, params = []) {
+  try {
+    const result = await db.execute({ sql, args: params });
+    return result.rows || [];
+  } catch (err) {
+    console.error('Database error:', err);
+    throw err;
+  }
 }
-
+ 
 /**
  * Execute single row select query
  * @param {string} sql - SQL query
  * @param {array} params - Query parameters
  * @returns {Promise} - Resolves with single row or null
  */
-function getAsync(sql, params = []) {
-  return new Promise((resolve, reject) => {
-    db.get(sql, params, (err, row) => {
-      if (err) {
-        console.error('Database error:', err);
-        reject(err);
-      } else {
-        resolve(row || null);
-      }
-    });
-  });
+async function getAsync(sql, params = []) {
+  try {
+    const result = await db.execute({ sql, args: params });
+    return result.rows && result.rows.length > 0 ? result.rows[0] : null;
+  } catch (err) {
+    console.error('Database error:', err);
+    throw err;
+  }
 }
-
+ 
 module.exports = {
   db,
   runAsync,
   allAsync,
-  getAsync
+  getAsync,
 };
+ 
