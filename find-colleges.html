@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Colleges &#8212; Amazon T Levels</title>
+<style>/* ── RESET & BASE ──────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#F2F4F7;color:#1E2B3C;line-height:1.6;}
+
+/* ── MODAL ─────────────────────────────────────────────────────────── */
+.modal{display:none;position:fixed;z-index:2000;inset:0;background:rgba(30,43,60,0.6);backdrop-filter:blur(8px);justify-content:center;align-items:center;}
+.modal-content{background:#E8ECF2;width:90%;max-width:560px;padding:40px;border-radius:16px;border-top:4px solid #FF9900;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:popup 0.3s ease;color:#1E2B3C;}
+.modal-content h2{color:#1E2B3C;margin-bottom:6px;font-size:22px;font-weight:700;}
+.modal-subtitle{color:#4A5568;font-size:14px;margin-bottom:24px;}
+.close-btn{float:right;font-size:24px;cursor:pointer;color:#4A5568;line-height:1;transition:color 0.2s;}
+.close-btn:hover{color:#FF9900;}
+.modal-content input,.modal-content select,.modal-content textarea{width:100%;padding:12px 16px;margin-bottom:14px;border:1.5px solid #D2D7DF;border-radius:10px;background:white;color:#1E2B3C;font-size:15px;outline:none;transition:border-color 0.2s;}
+.modal-content input:focus,.modal-content select:focus,.modal-content textarea:focus{border-color:#2E9E8E;}
+.modal-content textarea{height:100px;resize:vertical;}
+.modal-submit{background:#FF9900;color:white;font-weight:700;padding:13px 28px;border:none;border-radius:10px;font-size:15px;cursor:pointer;width:100%;transition:background 0.2s,transform 0.15s;}
+.modal-submit:hover{background:#e68a00;transform:translateY(-1px);}
+@keyframes popup{from{transform:scale(0.9) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+
+/* ── NAVBAR ─────────────────────────────────────────────────────────── */
+.navbar{background:#1E2B3C;padding:0 24px;height:70px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.25);}
+.logo{color:white;font-size:20px;font-weight:700;letter-spacing:-0.3px;white-space:nowrap;}
+.logo span{color:#FF9900;}
+.nav-links{display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:wrap;margin:0 24px;}
+.nav-links a{color:#D2D7DF;text-decoration:none;font-size:14px;font-weight:500;padding:8px 14px;border-radius:8px;transition:all 0.2s;}
+.nav-links a:hover{color:white;background:rgba(255,255,255,0.08);}
+.nav-links a.active{color:#FF9900;}
+.nav-tools{display:flex;gap:8px;align-items:center;margin-left:auto;}
+.logout-area{margin-right:auto;}
+.small-btn{background:none;color:#D2D7DF;padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.small-btn:hover{color:white;background:rgba(255,255,255,0.08);}
+
+/* ── HERO ───────────────────────────────────────────────────────────── */
+.page-hero{margin:28px;background:#1E2B3C;border-radius:20px;padding:120px 48px;text-align:center;box-shadow:0 8px 40px rgba(30,43,60,0.15);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:40px;min-height:400px;}
+.page-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF9900,#2E9E8E);}
+.page-hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(30,43,60,0.92) 0%,rgba(30,43,60,0.75) 100%);z-index:1;}
+.page-hero-content{position:relative;z-index:2;flex:1;text-align:center;max-width:900px;}
+.page-hero-image{position:relative;z-index:2;flex:0 0 300px;display:flex;align-items:center;justify-content:center;}
+.page-hero-image img{width:100%;max-width:300px;height:auto;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:none;opacity:0.95;transition:opacity 0.3s,transform 0.3s;}
+.page-hero:hover .page-hero-image img{opacity:1;transform:scale(1.03);}
+.page-hero h1{font-size:56px;font-weight:800;letter-spacing:-1px;margin-bottom:20px;color:white;display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;}
+.page-hero p{font-size:20px;max-width:800px;margin:0 auto;line-height:1.8;color:#D2D7DF;text-align:center;}
+
+/* ── SECTION LABELS ─────────────────────────────────────────────────── */
+.section-label{text-align:center;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#FF9900;margin:52px 0 10px;}
+.section-title{text-align:center;font-size:30px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;color:#1E2B3C;}
+.section-subtitle{text-align:center;font-size:15px;color:#4A5568;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;}
+
+/* ── GRID ───────────────────────────────────────────────────────────── */
+.content-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;padding:0 28px 32px;}
+
+/* ── INFO BOXES ─────────────────────────────────────────────────────── */
+.info-box{background:#1E2B3C;border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(0,0,0,0.12);color:white;transition:transform 0.25s,box-shadow 0.25s;border:1px solid rgba(255,255,255,0.05);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;}
+.info-box:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+.info-box-image{width:100%;height:220px;object-fit:cover;border-radius:12px;margin-bottom:16px;border:none;flex-shrink:0;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0.9;transition:opacity 0.3s,transform 0.3s;}
+.info-box:hover .info-box-image{opacity:1;transform:scale(1.02);}
+.info-box h2{color:#FF9900;margin-bottom:12px;font-size:18px;font-weight:700;flex-shrink:0;}
+.info-box p{line-height:1.75;color:#D2D7DF;margin-bottom:10px;font-size:14px;flex-grow:1;}
+.info-box ul{list-style:none;padding:0;color:#D2D7DF;font-size:14px;flex-grow:1;}
+.info-box ul li{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;line-height:1.6;}
+.info-box .tag{display:inline-block;background:rgba(255,153,0,0.15);color:#FF9900;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(255,153,0,0.3);flex-shrink:0;}
+.svg-icon{display:inline-block;vertical-align:middle;flex-shrink:0;}
+.info-box ul{list-style:none;padding:0;color:#D2D7DF;font-size:14px;}
+.info-box ul li{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;line-height:1.6;}
+.info-box .tag{display:inline-block;background:rgba(255,153,0,0.15);color:#FF9900;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(255,153,0,0.3);}
+.svg-icon{display:inline-block;vertical-align:middle;flex-shrink:0;}
+
+/* ── ACCENT BANNER ──────────────────────────────────────────────────── */
+.accent-banner{margin:0 28px 32px;background:#1E2B3C;border-radius:20px;padding:52px 48px;text-align:center;color:white;position:relative;overflow:hidden;border:1px solid rgba(46,158,142,0.3);}
+.accent-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2E9E8E,#FF9900);}
+.accent-banner h2{font-size:26px;font-weight:800;margin-bottom:12px;color:#E2E8F0;display:flex;align-items:center;justify-content:center;gap:12px;}
+.accent-banner>p{font-size:15px;max-width:700px;margin:0 auto 32px;line-height:1.8;color:#D2D7DF;}
+.step-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:24px;}
+.step-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px 20px;width:180px;text-align:center;backdrop-filter:blur(4px);}
+.step-card .step-num{font-size:28px;font-weight:800;color:#FF9900;margin-bottom:8px;}
+.step-card p{font-size:13px;color:#D2D7DF;margin:0;line-height:1.6;}
+
+/* ── TABLE ──────────────────────────────────────────────────────────── */
+.comparison-wrap{padding:0 28px 36px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:#1E2B3C;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
+thead{background:#FF9900;}
+thead th{padding:16px 20px;text-align:left;font-size:13px;font-weight:700;color:white;letter-spacing:0.3px;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(46,158,142,0.08);}
+tbody td{padding:14px 20px;color:#D2D7DF;font-size:14px;line-height:1.5;vertical-align:middle;}
+tbody td:first-child{font-weight:600;color:#E2E8F0;font-size:13px;}
+
+/* ── CARD SECTION ───────────────────────────────────────────────────── */
+.card-section{margin:0 28px 32px;background:#1E2B3C;border-radius:20px;padding:48px 40px;border:1px solid rgba(46,158,142,0.2);}
+.card-section-header{text-align:center;margin-bottom:36px;}
+.card-section-header h2{font-size:26px;font-weight:800;color:#E2E8F0;margin-bottom:8px;}
+.card-section-header p{color:#D2D7DF;font-size:15px;max-width:640px;margin:0 auto;line-height:1.75;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.feature-card{background:#0F1622;border-radius:14px;padding:0;border-left:3px solid #2E9E8E;transition:transform 0.25s,box-shadow 0.25s;overflow:hidden;display:flex;flex-direction:row;height:100%;min-height:180px;}
+.feature-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,0.25);}
+.feature-card .f-icon{margin-bottom:14px;display:none;}
+.feature-card-content{padding:24px;flex:1;display:flex;flex-direction:column;}
+.feature-card h3{color:#2E9E8E;font-size:16px;font-weight:700;margin-bottom:8px;flex-shrink:0;}
+.feature-card p{color:#D2D7DF;font-size:13px;line-height:1.65;flex-grow:1;}
+.feature-card:first-child{text-align:center;align-items:center;justify-content:center;}
+.feature-card:first-child .feature-card-content{align-items:center;}
+.feature-card:first-child h3{font-size:20px;}
+.feature-card:first-child p{font-size:15px;}
+
+/* ── FAQ ────────────────────────────────────────────────────────────── */
+.faq-section{padding:0 28px 40px;}
+.faq-item{background:#1E2B3C;border-radius:12px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);}
+.faq-question{padding:18px 22px;font-weight:600;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s;color:#E2E8F0;}
+.faq-question:hover{background:rgba(255,255,255,0.04);}
+.arrow-svg{transition:transform 0.3s;flex-shrink:0;}
+.faq-answer{display:none;padding:0 22px 18px;color:#D2D7DF;line-height:1.75;font-size:14px;}
+.faq-item.open .faq-answer{display:block;}
+.faq-item.open .arrow-svg{transform:rotate(180deg);}
+
+/* ── CTA BANNER ─────────────────────────────────────────────────────── */
+.cta-strip{margin:0 28px 40px;background:linear-gradient(135deg,#FF9900 0%,#e68a00 100%);border-radius:20px;padding:52px 48px;text-align:center;color:white;position:relative;overflow:hidden;}
+.cta-strip::after{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.cta-strip h2{font-size:26px;font-weight:800;margin-bottom:12px;}
+.cta-strip p{font-size:15px;max-width:560px;margin:0 auto 28px;opacity:0.92;line-height:1.75;}
+.cta-btn-group{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.2s;}
+.cta-btn.primary{background:#1E2B3C;color:#FF9900;}
+.cta-btn.primary:hover{background:#0F1622;transform:translateY(-1px);}
+.cta-btn.outline{background:transparent;color:white;border:2px solid rgba(255,255,255,0.5);}
+.cta-btn.outline:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px);}
+
+/* ── FOOTER ─────────────────────────────────────────────────────────── */
+footer{background:#1E2B3C;color:#D2D7DF;text-align:center;padding:24px 28px;margin-top:60px;font-size:13px;border-top:1px solid rgba(255,255,255,0.06);}
+footer strong{color:#FF9900;}
+
+/* ── SCROLL ANIMATIONS ──────────────────────────────────────────────── */
+.info-box,.feature-card,.faq-item,.step-card,.accent-banner,.card-section,.page-hero,.section-title,.section-label,.section-subtitle,.cta-strip,table,.comparison-wrap{opacity:0;transform:translateY(28px);transition:opacity 0.55s ease,transform 0.55s ease;}
+.in-view{opacity:1!important;transform:translateY(0)!important;}
+.content-grid .info-box:nth-child(1){transition-delay:0.05s;}
+.content-grid .info-box:nth-child(2){transition-delay:0.12s;}
+.content-grid .info-box:nth-child(3){transition-delay:0.19s;}
+.content-grid .info-box:nth-child(4){transition-delay:0.26s;}
+.content-grid .info-box:nth-child(5){transition-delay:0.33s;}
+.content-grid .info-box:nth-child(6){transition-delay:0.40s;}
+.card-grid .feature-card:nth-child(1){transition-delay:0.05s;}
+.card-grid .feature-card:nth-child(2){transition-delay:0.12s;}
+.card-grid .feature-card:nth-child(3){transition-delay:0.19s;}
+.card-grid .feature-card:nth-child(4){transition-delay:0.26s;}
+.card-grid .feature-card:nth-child(5){transition-delay:0.33s;}
+.card-grid .feature-card:nth-child(6){transition-delay:0.40s;}
+.faq-section .faq-item:nth-child(1){transition-delay:0.05s;}
+.faq-section .faq-item:nth-child(2){transition-delay:0.10s;}
+.faq-section .faq-item:nth-child(3){transition-delay:0.15s;}
+.faq-section .faq-item:nth-child(4){transition-delay:0.20s;}
+.faq-section .faq-item:nth-child(5){transition-delay:0.25s;}
+.faq-section .faq-item:nth-child(6){transition-delay:0.30s;}
+.step-row .step-card:nth-child(1){transition-delay:0.08s;}
+.step-row .step-card:nth-child(2){transition-delay:0.16s;}
+.step-row .step-card:nth-child(3){transition-delay:0.24s;}
+.step-row .step-card:nth-child(4){transition-delay:0.32s;}
+
+
+/* ── CHATBOT ────────────────────────────────────────────────────────── */
+#chat-fab{position:fixed;bottom:28px;right:28px;width:54px;height:54px;border-radius:50%;background:#1E2B3C;color:white;border:2px solid #FF9900;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,0.3);z-index:9000;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,background 0.2s;}
+#chat-fab:hover{transform:scale(1.08);background:#FF9900;}
+#chat-window{display:none;flex-direction:column;position:fixed;bottom:96px;right:28px;width:340px;max-height:480px;background:#E8ECF2;border:1px solid rgba(30,43,60,0.15);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.25);z-index:9001;overflow:hidden;animation:chatPop 0.25s ease;}
+@keyframes chatPop{from{transform:scale(0.9) translateY(12px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+#chat-header{background:#1E2B3C;color:white;padding:14px 18px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+#chat-close{background:none;border:none;color:#D2D7DF;font-size:18px;cursor:pointer;padding:0;transition:color 0.2s;}
+#chat-close:hover{color:white;}
+#chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{max-width:82%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word;}
+.chat-msg.bot{background:#1E2B3C;color:#E2E8F0;align-self:flex-start;border-bottom-left-radius:4px;}
+.chat-msg.user{background:#FF9900;color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-msg.typing{color:#4A5568;font-style:italic;background:#1E2B3C;align-self:flex-start;}
+#chat-input-row{display:flex;padding:10px 12px;gap:8px;background:#E8ECF2;flex-shrink:0;border-top:1px solid #D2D7DF;}
+#chat-input{flex:1;padding:9px 14px;border-radius:20px;border:1.5px solid #D2D7DF;background:white;color:#1E2B3C;font-size:14px;outline:none;transition:border-color 0.2s;}
+#chat-input:focus{border-color:#2E9E8E;}
+#chat-send{background:#FF9900;border:none;color:white;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
+#chat-send:hover{background:#e68a00;}
+
+/* ── DYSLEXIC FONT ─────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+.dyslexic-font, .dyslexic-font * {
+  font-family: 'OpenDyslexic', 'Segoe UI', Arial, sans-serif !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+/* ── SETTINGS MODAL ────────────────────────────────────────────────── */
+.settings-btn{padding:10px 20px;background:white;color:#1E2B3C;border:1.5px solid #D2D7DF;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;min-width: 60px;}
+.settings-btn:hover{border-color:#2E9E8E;color:#2E9E8E;}
+.settings-btn.active{background:#2E9E8E;color:white;border-color:#2E9E8E;}
+.settings-btn[data-action="textSize"]:nth-child(1){font-size: 12px;}
+.settings-btn[data-action="textSize"]:nth-child(2){font-size: 16px;}
+.settings-btn[data-action="textSize"]:nth-child(3){font-size: 20px;}
+
+/* ── HIGH CONTRAST MODE ────────────────────────────────────────────── */
+.high-contrast{background:#000000 !important;color:#FFFFFF !important;}
+.high-contrast .navbar{background:#000000 !important;border-bottom: 2px solid #FFFF00 !important;}
+.high-contrast .page-hero{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .page-hero h1{color:#FFFF00 !important;}
+.high-contrast .page-hero p{color:#FFFFFF !important;}
+.high-contrast .info-box{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFFFF !important;}
+.high-contrast .info-box h2{color:#FFFF00 !important;}
+.high-contrast .info-box p{color:#FFFFFF !important;}
+.high-contrast .info-box ul{color:#FFFFFF !important;}
+.high-contrast .info-box .tag{background:#FFFF00 !important;color:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .section-title{color:#FFFF00 !important;}
+.high-contrast .section-subtitle{color:#FFFFFF !important;}
+.high-contrast .accent-banner{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .accent-banner h2{color:#FFFF00 !important;}
+.high-contrast .accent-banner p{color:#FFFFFF !important;}
+.high-contrast .card-section{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .feature-card{background:#000000 !important;border-left: 3px solid #FFFF00 !important;}
+.high-contrast .feature-card h3{color:#FFFF00 !important;}
+.high-contrast .feature-card p{color:#FFFFFF !important;}
+.high-contrast .faq-item{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .faq-question{color:#FFFF00 !important;}
+.high-contrast .faq-answer{color:#FFFFFF !important;}
+.high-contrast .cta-strip{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .cta-strip h2{color:#FFFF00 !important;}
+.high-contrast .cta-strip p{color:#FFFFFF !important;}
+.high-contrast footer{background:#000000 !important;border-top: 2px solid #FFFF00 !important;}
+.high-contrast .modal-content{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFFFF !important;}
+.high-contrast .modal-content h2{color:#FFFF00 !important;}
+.high-contrast .close-btn{color:#FFFFFF !important;}
+.high-contrast .close-btn:hover{color:#FFFF00 !important;}
+.high-contrast .chat-msg.bot{background:#000000 !important;color:#FFFFFF !important;border: 1px solid #FFFF00 !important;}
+.high-contrast .chat-msg.user{background:#FFFF00 !important;color:#000000 !important;}
+.high-contrast #chat-header{background:#000000 !important;border-bottom: 2px solid #FFFF00 !important;}
+.high-contrast #chat-fab{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFF00 !important;}
+.high-contrast .btn-submit{background:#FFFF00 !important;color:#000000 !important;}
+.high-contrast .form-group label{color:#FFFF00 !important;}
+.high-contrast .form-group input,.high-contrast .form-group select{background:#000000 !important;color:#FFFFFF !important;border: 2px solid #FFFF00 !important;}
+
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  DARK MODE — Applied to every page                              ║
+   ║  Palette:                                                       ║
+   ║    Main bg     #0F172A   Navbar      #162033                    ║
+   ║    Cards       #1E293B   Hero        #1B263B                    ║
+   ║    Primary txt #F8FAFC   Secondary   #CBD5E1                    ║
+   ║    Accent      #FF9900   Hover acc   #FFB84D                    ║
+   ║    Borders     #334155                                          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* Base */
+.dark-mode,
+html.dark-mode body{background:#0F172A!important;color:#F8FAFC!important;}
+
+/* Navbar */
+.dark-mode .navbar{background:#162033!important;box-shadow:0 2px 20px rgba(0,0,0,0.5)!important;border-bottom:1px solid #334155!important;}
+.dark-mode .logo{color:#F8FAFC!important;}
+.dark-mode .logo span{color:#FF9900!important;}
+.dark-mode .nav-links a{color:#CBD5E1!important;}
+.dark-mode .nav-links a:hover{color:#F8FAFC!important;background:rgba(255,255,255,0.07)!important;}
+.dark-mode .nav-links a.active{color:#FF9900!important;}
+.dark-mode .small-btn{color:#CBD5E1!important;}
+.dark-mode .small-btn:hover{color:#FFB84D!important;background:rgba(255,255,255,0.07)!important;}
+
+/* Hero */
+.dark-mode .page-hero{background:#1B263B!important;box-shadow:0 8px 40px rgba(0,0,0,0.5)!important;}
+.dark-mode .page-hero h1{color:#F8FAFC!important;}
+.dark-mode .page-hero p{color:#CBD5E1!important;}
+
+/* Section labels */
+.dark-mode .section-label{color:#FF9900!important;}
+.dark-mode .section-title{color:#F8FAFC!important;}
+.dark-mode .section-subtitle{color:#CBD5E1!important;}
+
+/* Info boxes / general cards */
+.dark-mode .info-box{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .info-box h2{color:#FF9900!important;}
+.dark-mode .info-box p{color:#CBD5E1!important;}
+.dark-mode .info-box ul{color:#CBD5E1!important;}
+.dark-mode .info-box .tag{background:rgba(255,153,0,0.15)!important;color:#FF9900!important;border-color:rgba(255,153,0,0.3)!important;}
+
+/* Accent banner */
+.dark-mode .accent-banner{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .accent-banner h2{color:#F8FAFC!important;}
+.dark-mode .accent-banner>p{color:#CBD5E1!important;}
+.dark-mode .step-card{background:rgba(255,255,255,0.04)!important;border-color:#334155!important;}
+.dark-mode .step-card p{color:#CBD5E1!important;}
+
+/* Card section */
+.dark-mode .card-section{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .card-section-header h2{color:#F8FAFC!important;}
+.dark-mode .card-section-header p{color:#CBD5E1!important;}
+.dark-mode .feature-card{background:#0F172A!important;border-left-color:#2E9E8E!important;}
+.dark-mode .feature-card h3{color:#2E9E8E!important;}
+.dark-mode .feature-card p{color:#CBD5E1!important;}
+
+/* FAQ */
+.dark-mode .faq-item{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .faq-question{color:#F8FAFC!important;}
+.dark-mode .faq-question:hover{background:rgba(255,255,255,0.04)!important;}
+.dark-mode .faq-answer{color:#CBD5E1!important;}
+
+/* Table */
+.dark-mode table{background:#1E293B!important;box-shadow:0 4px 20px rgba(0,0,0,0.4)!important;}
+.dark-mode tbody tr{border-bottom-color:#334155!important;}
+.dark-mode tbody td{color:#CBD5E1!important;}
+.dark-mode tbody td:first-child{color:#F8FAFC!important;}
+.dark-mode tbody tr:hover{background:rgba(46,158,142,0.1)!important;}
+
+/* CTA strip — keep the orange gradient, just ensure text readable */
+.dark-mode .cta-strip{background:linear-gradient(135deg,#FF9900 0%,#e68a00 100%)!important;}
+.dark-mode .cta-strip h2{color:#0F172A!important;}
+.dark-mode .cta-strip p{color:#0F172A!important;opacity:0.9!important;}
+.dark-mode .cta-btn.primary{background:#0F172A!important;color:#FF9900!important;}
+.dark-mode .cta-btn.primary:hover{background:#162033!important;}
+.dark-mode .cta-btn.outline{color:#0F172A!important;border-color:rgba(15,23,42,0.5)!important;}
+.dark-mode .cta-btn.outline:hover{background:rgba(15,23,42,0.15)!important;}
+
+/* Footer */
+.dark-mode footer{background:#162033!important;color:#CBD5E1!important;border-top-color:#334155!important;}
+.dark-mode footer strong{color:#FF9900!important;}
+
+/* Contact / generic modal */
+.dark-mode .modal-content{background:#1E293B!important;color:#F8FAFC!important;border-top-color:#FF9900!important;}
+.dark-mode .modal-content h2{color:#F8FAFC!important;}
+.dark-mode .modal-content h3{color:#F8FAFC!important;}
+.dark-mode .modal-subtitle{color:#CBD5E1!important;}
+.dark-mode .close-btn{color:#CBD5E1!important;}
+.dark-mode .close-btn:hover{color:#FFB84D!important;}
+.dark-mode .modal-content input,
+.dark-mode .modal-content select,
+.dark-mode .modal-content textarea{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .modal-content input:focus,
+.dark-mode .modal-content select:focus,
+.dark-mode .modal-content textarea:focus{border-color:#2E9E8E!important;}
+.dark-mode .modal-content input::placeholder,
+.dark-mode .modal-content textarea::placeholder{color:#64748B!important;}
+.dark-mode .modal-content option{background:#1E293B!important;color:#F8FAFC!important;}
+
+/* Settings modal interior */
+.dark-mode #languageSelect{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode label span,
+.dark-mode #reduceMotion+span{color:#F8FAFC!important;}
+.dark-mode .settings-btn{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .settings-btn:hover{border-color:#FFB84D!important;color:#FFB84D!important;}
+.dark-mode .settings-btn.active{background:#2E9E8E!important;color:white!important;border-color:#2E9E8E!important;}
+
+/* Chatbot */
+.dark-mode #chat-fab{background:#162033!important;border-color:#FF9900!important;}
+.dark-mode #chat-fab:hover{background:#FF9900!important;}
+.dark-mode #chat-window{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode #chat-header{background:#162033!important;}
+.dark-mode #chat-messages{background:#1E293B!important;}
+.dark-mode .chat-msg.bot{background:#162033!important;color:#F8FAFC!important;}
+.dark-mode .chat-msg.typing{background:#162033!important;color:#CBD5E1!important;}
+.dark-mode #chat-input-row{background:#1E293B!important;border-top-color:#334155!important;}
+.dark-mode #chat-input{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode #chat-input::placeholder{color:#64748B!important;}
+
+
+/* Find-Colleges page */
+.dark-mode .search-form input,
+.dark-mode .search-form select{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .search-form input::placeholder{color:#64748B!important;}
+.dark-mode .search-form input:focus,
+.dark-mode .search-form select:focus{border-color:#2E9E8E!important;}
+.dark-mode .search-form option{background:#1E293B!important;color:#F8FAFC!important;}
+.dark-mode .college-card{background:#1E293B!important;border-top-color:#FF9900!important;border-color:#334155!important;}
+.dark-mode .college-card h3{color:#FF9900!important;}
+.dark-mode .college-card p{color:#CBD5E1!important;}
+.dark-mode .college-card .college-badge{background:rgba(46,158,142,0.15)!important;color:#2E9E8E!important;border-color:rgba(46,158,142,0.3)!important;}
+.dark-mode .college-card .college-stat span{background:rgba(255,255,255,0.04)!important;color:#CBD5E1!important;border:1px solid #334155!important;}
+.dark-mode .map-placeholder{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .map-placeholder h3{color:#F8FAFC!important;}
+.dark-mode .map-placeholder p{color:#CBD5E1!important;}
+
+
+/* ── REDUCED MOTION ────────────────────────────────────────────────── */
+.reduce-motion .info-box,.reduce-motion .feature-card,.reduce-motion .faq-item,.reduce-motion .step-card,.reduce-motion .accent-banner,.reduce-motion .card-section,.reduce-motion .page-hero,.reduce-motion .section-title,.reduce-motion .section-label,.reduce-motion .section-subtitle,.reduce-motion .cta-strip,.reduce-motion table,.reduce-motion .comparison-wrap{transition: none !important; animation: none !important; opacity: 1 !important; transform: none !important;}
+.reduce-motion .arrow-svg{transition: none !important;}
+.reduce-motion #chat-window{animation: none !important;}
+.reduce-motion .modal-content{animation: none !important;}
+
+/* ── TEXT SIZE VARIANTS ────────────────────────────────────────────── */
+.text-small{font-size: 14px;}
+.text-small .page-hero h1{font-size: 36px;}
+.text-small .page-hero p{font-size: 15px;}
+.text-small .section-title{font-size: 24px;}
+.text-small .info-box p,.text-small .info-box ul{font-size: 13px;}
+.text-small .faq-question{font-size: 14px;}
+.text-small tbody td{font-size: 13px;}
+
+.text-large{font-size: 18px;}
+.text-large .page-hero h1{font-size: 52px;}
+.text-large .page-hero p{font-size: 19px;}
+.text-large .section-title{font-size: 34px;}
+.text-large .info-box p,.text-large .info-box ul{font-size: 17px;}
+.text-large .faq-question{font-size: 17px;}
+.text-large tbody td{font-size: 16px;}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:768px){
+    .navbar{padding:0 16px;height:auto;flex-wrap:wrap;gap:10px;padding:12px 16px;}
+    .page-hero{margin:16px;padding:40px 24px;}
+    .page-hero h1{font-size:32px;}
+    .content-grid{padding:0 16px 24px;}
+    .comparison-wrap,.faq-section{padding:0 16px 24px;}
+    .accent-banner,.card-section,.cta-strip{margin:0 16px 24px;padding:36px 24px;}
+}
+/* ── COLLEGE LIST STYLES ────────────────────────────────────────────── */
+.college-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;padding:0 28px 32px;}
+.college-card{background:#1E2B3C;border-radius:16px;padding:24px;border-top:3px solid #FF9900;color:white;transition:transform 0.25s,box-shadow 0.25s;}
+.college-card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,0.2);}
+.college-card h3{color:#FF9900;font-size:17px;margin-bottom:8px;}
+.college-card .college-badge{display:inline-block;background:rgba(46,158,142,0.15);color:#2E9E8E;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:10px;letter-spacing:0.5px;border:1px solid rgba(46,158,142,0.3);}
+.college-card p{color:#D2D7DF;font-size:13px;line-height:1.7;margin-bottom:6px;}
+.college-card .college-stat{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.college-card .college-stat span{background:rgba(255,255,255,0.05);padding:4px 10px;border-radius:6px;font-size:11px;color:#D2D7DF;}
+/* ── MAP PLACEHOLDER ────────────────────────────────────────────────── */
+.map-placeholder{background:#0F1622;border-radius:14px;padding:40px;text-align:center;margin:0 28px 32px;border:1px dashed rgba(255,255,255,0.1);color:#D2D7DF;}
+.map-placeholder svg{margin-bottom:12px;opacity:0.4;}
+.map-placeholder h3{color:#E2E8F0;font-size:18px;margin-bottom:8px;}
+.map-placeholder p{font-size:13px;max-width:400px;margin:0 auto;line-height:1.6;}
+/* ── SEARCH FORM ────────────────────────────────────────────────────── */
+.search-form{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;padding:20px 28px;max-width:700px;margin:0 auto;}
+.search-form input,.search-form select{padding:12px 18px;border-radius:10px;border:1.5px solid #D2D7DF;font-size:14px;background:white;color:#1E2B3C;flex:1;min-width:180px;outline:none;transition:border-color 0.2s;}
+.search-form input:focus,.search-form select:focus{border-color:#2E9E8E;}
+.search-form button{background:#FF9900;color:white;border:none;padding:12px 28px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:background 0.2s;}
+.search-form button:hover{background:#e68a00;}
+/* ── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:768px){
+    .college-list{padding:0 16px 24px;}
+    .map-placeholder{margin:0 16px 24px;padding:28px 20px;}
+    .search-form{padding:16px;}
+}
+</style>
+</head>
+<body>
+<div id="contactModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2 data-i18n="getInTouch">Get in Touch</h2>
+    <p class="modal-subtitle" data-i18n="respondTime">We typically respond within one working day.</p>
+    <form id="contactForm">
+      <input type="text" id="contactName" placeholder="Your name" required>
+      <input type="email" id="contactEmail" placeholder="Email address" required>
+      <select id="contactSubject" required>
+        <option value="" data-i18n="helpWith">What do you need help with?</option>
+        <option value="T Levels Information" data-i18n="tLevelsInfo">T Levels Information</option>
+        <option value="Industry Placements" data-i18n="industryPlacements">Industry Placements</option>
+        <option value="School Partnership" data-i18n="schoolPartnership">School Partnership</option>
+        <option value="Technical Support" data-i18n="techSupport">Technical Support</option>
+        <option value="Other" data-i18n="other">Other</option>
+      </select>
+      <textarea id="contactMessage" placeholder="Describe your enquiry..." required></textarea>
+      <button type="submit" class="modal-submit" data-i18n="sendMessage">Send Message</button>
+    </form>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content" style="max-width: 600px;">
+    <span class="close-btn">&times;</span>
+    <h2 data-i18n="accessibilitySettings">Accessibility Settings</h2>
+    <p class="modal-subtitle" data-i18n="customizeExperience">Customize your experience</p>
+    
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="textSize">Text Size</h3>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="settings-btn" data-action="textSize" data-value="small">A</button>
+        <button class="settings-btn active" data-action="textSize" data-value="medium">A</button>
+        <button class="settings-btn" data-action="textSize" data-value="large">A</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="displayMode">Display Mode</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="displayMode" data-value="normal" data-i18n="normal">Normal</button>
+        <button class="settings-btn" data-action="displayMode" data-value="dark" data-i18n="darkMode">Dark Mode</button>
+        <button class="settings-btn" data-action="displayMode" data-value="highContrast" data-i18n="highContrast">High Contrast</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="dyslexicFont">Dyslexic Friendly Font</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="dyslexicFont" data-value="off" data-i18n="off">Off</button>
+        <button class="settings-btn" data-action="dyslexicFont" data-value="on" data-i18n="on">On</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="language">Language</h3>
+      <select id="languageSelect" style="width: 100%; padding: 10px 14px; border: 1.5px solid #D2D7DF; border-radius: 8px; font-size: 14px; background: white; color: #1E2B3C;">
+        <option value="en">English</option>
+        <option value="fr">Français (French)</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="de">Deutsch (German)</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="motion">Motion</h3>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="reduceMotion" style="width: 18px; height: 18px; cursor: pointer;">
+        <span style="font-size: 14px; color: #1E2B3C;" data-i18n="reduceMotion">Reduce motion (disable animations)</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="logout-area"><button id="logoutBtn" class="small-btn" aria-label="Sign out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span data-i18n="signOut">Sign out</span></button></div>
+  <div class="logo">Amazon <span>T Levels</span></div>
+  <div class="nav-links">
+    <a href="Main.html" data-i18n="home">Home</a>
+    <a href="students.html" data-i18n="students">Students</a>
+    <a href="parents.html" data-i18n="parents">Parents</a>
+    <a href="schools.html" data-i18n="schools">Schools</a>
+    <a href="advisors.html" data-i18n="advisors">Advisors</a>
+    <a href="find-colleges.html" class="active" data-i18n="findCollegesNav">Find Colleges</a>
+    <a href="#" id="contactBtn" data-i18n="contact">Contact</a>
+  </div>
+  <div class="nav-tools">
+    <button id="settingsBtn" class="small-btn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+</nav>
+
+<div class="page-hero" style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110a9f1?w=1200&h=600&fit=crop'); background-size: cover; background-position: center;">
+  <div class="page-hero-content">
+    <h1>
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span data-i18n="findColleges">Find T Level Colleges Near You</span>
+    </h1>
+    <p data-i18n="findCollegesDesc">Search for schools and colleges offering T Levels with Amazon placements in your area. Filter by subject, location, and study mode.</p>
+  </div>
+</div>
+
+<p class="section-label" data-i18n="search">Search</p>
+<h2 class="section-title" data-i18n="findPerfectPlacement">Find Your Perfect Placement</h2>
+<p class="section-subtitle" data-i18n="findPerfectPlacementDesc">Use our search tool to discover T Level opportunities near you</p>
+
+<div class="search-form">
+  <input type="text" id="locationSearch" placeholder="Enter postcode or town..." data-i18n="locationPlaceholder">
+  <select id="subjectFilter">
+    <option value="all" data-i18n="allSubjects">All Subjects</option>
+    <option data-i18n="digitalIT">Digital & IT</option>
+    <option data-i18n="construction">Construction</option>
+    <option data-i18n="healthScience">Health & Science</option>
+    <option data-i18n="businessFinance">Business & Finance</option>
+    <option data-i18n="engineering">Engineering</option>
+  </select>
+  <button data-i18n="search">Search</button>
+</div>
+
+<div class="content-grid">
+  <div class="info-box">
+    <span class="tag" data-i18n="search">Search</span>
+    <h2 data-i18n="byLocation">By Location</h2>
+    <p data-i18n="byLocationDesc">Enter your postcode or town to find T Level providers within your preferred travel distance. We show you all schools and colleges offering Amazon placements in your area.</p>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="filter">Filter</span>
+    <h2 data-i18n="bySubject">By Subject</h2>
+    <p data-i18n="bySubjectDesc">Choose from over 20 T Level routes including Digital, Engineering, Health, Business, and more. See which subjects each college offers and their specific Amazon placement structure.</p>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="compare">Compare</span>
+    <h2 data-i18n="sideBySide">Side by Side</h2>
+    <p data-i18n="sideBySideDesc">Compare up to three colleges at once. View placement hours, employer partnerships, student outcomes, and Ofsted ratings to make an informed choice.</p>
+  </div>
+</div>
+
+<div class="accent-banner">
+  <h2>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+    <span data-i18n="howToUse">How to Use This Search Tool</span>
+  </h2>
+  <p data-i18n="howToUseDesc">Finding the right T Level provider is the first step towards a successful placement. Here is how to get the most from your search.</p>
+  <div class="step-row">
+    <div class="step-card"><div class="step-num">1</div><p data-i18n="step1">Enter your location or postcode to see nearby providers.</p></div>
+    <div class="step-card"><div class="step-num">2</div><p data-i18n="step2">Filter by subject area and study mode (full-time, part-time).</p></div>
+    <div class="step-card"><div class="step-num">3</div><p data-i18n="step3">Review placement details, employer partners, and outcomes.</p></div>
+    <div class="step-card"><div class="step-num">4</div><p data-i18n="step4">Contact colleges directly or request more information.</p></div>
+  </div>
+</div>
+
+<div class="map-placeholder">
+  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+  <h3 data-i18n="interactiveMap">Interactive Map</h3>
+  <p data-i18n="interactiveMapDesc">An interactive map will display here, showing all T Level providers near your selected location with Amazon placement opportunities.</p>
+</div>
+
+<!-- ── RESULTS SECTION ────────────────────────────────────────── -->
+<div id="collegeResults" class="college-list" style="display: none;"></div>
+<div id="noResults" style="display: none; text-align: center; padding: 48px 28px; color: #4A5568; font-size: 15px; line-height: 1.8;" data-i18n="noResults">No colleges found matching your criteria. Try a different location or subject.</div>
+<div id="searchError" style="display: none; text-align: center; padding: 48px 28px; color: #e74c3c; font-size: 15px; line-height: 1.8;" data-i18n="searchError">Something went wrong while searching. Please try again later.</div>
+
+<div class="card-section">
+  <div class="card-section-header">
+    <h2 data-i18n="whatToLookFor">What to Look For</h2>
+    <p data-i18n="whatToLookForDesc">Not all T Level placements are the same. Here are the key factors that make a difference to student success.</p>
+  </div>
+  <div class="card-grid">
+    <div class="feature-card">
+      <div class="feature-card-content">
+        <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3 data-i18n="employerPartnerships">Employer Partnerships</h3>
+        <p data-i18n="employerPartnershipsDesc">Look for colleges with established relationships with major employers like Amazon. These partnerships indicate quality placements and strong student support.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-content">
+        <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <h3 data-i18n="studentOutcomes">Student Outcomes</h3>
+        <p data-i18n="studentOutcomesDesc">Check progression rates to university, apprenticeships, and employment. Colleges with strong Amazon partnerships often have higher placement completion rates.</p>
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-card-content">
+        <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+        <h3 data-i18n="nationalCoverage">National Coverage</h3>
+        <p data-i18n="nationalCoverageDesc">Amazon has placement opportunities across the UK. Use our map to find colleges near Amazon fulfilment centres, offices, and tech hubs.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="section-label" data-i18n="faqs">FAQs</p>
+<h2 class="section-title" data-i18n="faqTitle">Common Questions</h2>
+<p class="section-subtitle" data-i18n="faqDesc">What students and parents ask about finding T Level providers</p>
+
+<div class="faq-section">
+  <div class="faq-item"><div class="faq-question" data-i18n="faq1Question">How do I know if a college offers Amazon placements?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq1Answer">Our search tool clearly marks colleges that offer Amazon placements. You can also look for the Amazon T Levels badge on college websites or contact them directly to ask about their industry placement partners.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq2Question">Can I visit a college before applying?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq2Answer">Yes. Most colleges hold open days and taster sessions throughout the year. We recommend visiting at least two or three providers to compare facilities, speak to current students, and get a feel for the college environment.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq3Question">What if there is no Amazon placement near me?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq3Answer">Amazon is expanding its placement network across the UK. If there is no local Amazon placement, speak to your school or target college about expressing interest. Amazon prioritises schools that actively engage with their T Level programme.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq4Question">Are all T Level providers the same quality?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq4Answer">No. T Level quality varies by provider. Check Ofsted ratings, student satisfaction scores, and progression outcomes. Colleges with strong employer partnerships like Amazon typically have better resources and support for placements.</div></div>
+</div>
+
+<div class="cta-strip">
+  <h2 data-i18n="readyToFind">Ready to Find Your College?</h2>
+  <p data-i18n="ctaFindDesc">Start searching now and take the first step towards a T Level with an Amazon placement.</p>
+  <div class="cta-btn-group">
+    <a href="#" class="cta-btn primary" data-i18n="startSearch">Start Your Search</a>
+    <a href="#" id="ctaContactBtn" class="cta-btn outline" data-i18n="getHelp">Get Help</a>
+  </div>
+</div>
+
+<footer data-i18n="footerText">© 2026 <strong>Amazon T Levels Hub</strong> — Supporting Future Careers</footer>
+<button id="chat-fab" title="Chat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+<div id="chat-window"><div id="chat-header"><span data-i18n="chatTitle">T Levels Assistant</span><button id="chat-close">✕</button></div><div id="chat-messages"><div class="chat-msg bot" data-i18n="chatWelcome">Hi! I am the T Levels Assistant. Ask me anything about T Levels or Amazon placements.</div></div><div id="chat-input-row"><input id="chat-input" type="text" placeholder="Ask a question..." autocomplete="off" maxlength="500"><button id="chat-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
+<script src="translations.js"></script>
+<script>
+const html=document.documentElement;
+const modal=document.getElementById('contactModal');
+function openModal(){modal.style.display='flex';}
+document.getElementById('contactBtn').addEventListener('click',function(e){e.preventDefault();openModal();});
+const ctaBtn=document.getElementById('ctaContactBtn');if(ctaBtn)ctaBtn.addEventListener('click',function(e){e.preventDefault();openModal();});
+document.querySelector('.close-btn').addEventListener('click',function(){modal.style.display='none';});
+window.addEventListener('click',function(e){if(e.target===modal)modal.style.display='none';});
+document.getElementById('contactForm').addEventListener('submit',async function(e){e.preventDefault();const name=document.getElementById('contactName').value;const email=document.getElementById('contactEmail').value;const subject=document.getElementById('contactSubject').value;const message=document.getElementById('contactMessage').value;const submitBtn=this.querySelector('.modal-submit');const origText=submitBtn.textContent;submitBtn.textContent='Sending...';submitBtn.disabled=true;try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,subject,message})});const data=await r.json();if(data.success){alert('Thank you! We have received your enquiry. A confirmation email has been sent to '+email);}else{alert('Something went wrong. Please try again later.');}}catch(err){alert('Connection error. Please try again later.');}submitBtn.textContent=origText;submitBtn.disabled=false;modal.style.display='none';this.reset();});
+window.addEventListener('load',function(){if(!localStorage.getItem('authToken'))window.location.href='index.html';});
+document.getElementById('logoutBtn').addEventListener('click',function(){localStorage.removeItem('authToken');window.location.href='index.html';});
+const obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in-view');obs.unobserve(x.target);}});},{threshold:0.08});
+document.querySelectorAll('.info-box,.feature-card,.faq-item,.step-card,.accent-banner,.card-section,.page-hero,.section-title,.section-label,.section-subtitle,.cta-strip,table,.comparison-wrap,.college-card').forEach(function(el){el.style.opacity='0';el.style.transform='translateY(28px)';obs.observe(el);});
+document.querySelectorAll('.faq-question').forEach(function(q){q.addEventListener('click',function(){const item=this.parentElement;const wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!wasOpen)item.classList.add('open');});});
+
+// Settings Modal
+const settingsModal=document.getElementById('settingsModal');
+const settingsBtn=document.getElementById('settingsBtn');
+if(settingsBtn){settingsBtn.addEventListener('click',function(e){e.preventDefault();settingsModal.style.display='flex';});}
+if(settingsModal){settingsModal.querySelector('.close-btn').addEventListener('click',function(){settingsModal.style.display='none';});window.addEventListener('click',function(e){if(e.target===settingsModal)settingsModal.style.display='none';});}
+const settingsButtons=document.querySelectorAll('.settings-btn');
+const languageSelect=document.getElementById('languageSelect');
+const reduceMotionCheckbox=document.getElementById('reduceMotion');
+settingsButtons.forEach(function(button){button.addEventListener('click',function(){const action=this.dataset.action;const value=this.dataset.value;if(action==='textSize'){html.classList.remove('text-small','text-large');if(value==='small')html.classList.add('text-small');if(value==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('textSize',value);}if(action==='displayMode'){html.classList.remove('dark-mode','high-contrast');if(value==='dark')html.classList.add('dark-mode');if(value==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('displayMode',value);}if(action==='dyslexicFont'){if(value==='on'){html.classList.add('dyslexic-font');}else{html.classList.remove('dyslexic-font');}settingsButtons.forEach(function(btn){if(btn.dataset.action==='dyslexicFont')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('dyslexicFont',value);}});});
+if(languageSelect){languageSelect.addEventListener('change',function(){localStorage.setItem('language',this.value);updateLanguage(this.value,'findColleges');});}
+if(reduceMotionCheckbox){reduceMotionCheckbox.addEventListener('change',function(){if(this.checked){html.classList.add('reduce-motion');localStorage.setItem('reduceMotion','enabled');}else{html.classList.remove('reduce-motion');localStorage.setItem('reduceMotion','disabled');}});}
+window.addEventListener('load',function(){const savedTextSize=localStorage.getItem('textSize');if(savedTextSize){html.classList.remove('text-small','text-large');if(savedTextSize==='small')html.classList.add('text-small');if(savedTextSize==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize'&&btn.dataset.value===savedTextSize)btn.classList.add('active');else if(btn.dataset.action==='textSize')btn.classList.remove('active');});}const savedDisplayMode=localStorage.getItem('displayMode');if(savedDisplayMode){html.classList.remove('dark-mode','high-contrast');if(savedDisplayMode==='dark')html.classList.add('dark-mode');if(savedDisplayMode==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode'&&btn.dataset.value===savedDisplayMode)btn.classList.add('active');else if(btn.dataset.action==='displayMode')btn.classList.remove('active');});}const savedReduceMotion=localStorage.getItem('reduceMotion');if(savedReduceMotion==='enabled'&&reduceMotionCheckbox){reduceMotionCheckbox.checked=true;html.classList.add('reduce-motion');}const savedLanguage=localStorage.getItem('language');if(savedLanguage&&languageSelect){languageSelect.value=savedLanguage;updateLanguage(savedLanguage,'findColleges');}});
+
+// Chatbot
+(function(){
+  const fab=document.getElementById('chat-fab'),win=document.getElementById('chat-window'),cb=document.getElementById('chat-close'),inp=document.getElementById('chat-input'),send=document.getElementById('chat-send'),msgs=document.getElementById('chat-messages');
+  let history=[];
+  fab.addEventListener('click',function(){win.style.display===('flex')?win.style.display='none':(win.style.display='flex',inp.focus());});
+  cb.addEventListener('click',function(){win.style.display='none';});
+  function appendMsg(text,role){const d=document.createElement('div');d.className='chat-msg '+role;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
+  async function sendMessage(){const text=inp.value.trim();if(!text)return;appendMsg(text,'user');history.push({role:'user',text});inp.value='';const t=appendMsg('Typing…','bot typing');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history})});const data=await r.json();const reply=data.reply||'Sorry, no response.';t.classList.remove('typing');t.textContent=reply;history.push({role:'bot',text:reply});}catch(err){t.classList.remove('typing');t.textContent='Connection error — is the server running?';}}
+  send.addEventListener('click',sendMessage);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')sendMessage();});
+})();
+
+// ── COLLEGE SEARCH ────────────────────────────────────────────────────
+const searchBtn=document.querySelector('.search-form button');
+const locationInput=document.getElementById('locationSearch');
+const subjectSelect=document.getElementById('subjectFilter');
+const resultsContainer=document.getElementById('collegeResults');
+const noResults=document.getElementById('noResults');
+const searchError=document.getElementById('searchError');
+
+function searchColleges(){
+  const location=locationInput.value.trim();
+  const subject=subjectSelect.value;
+  
+  // Build query string
+  var params=[];
+  if(location)params.push('location='+encodeURIComponent(location));
+  if(subject&&subject!=='all')params.push('subject='+encodeURIComponent(subject));
+  var qs=params.length?'?'+params.join('&'):'';
+  
+  // Hide previous results/errors
+  resultsContainer.style.display='none';
+  noResults.style.display='none';
+  searchError.style.display='none';
+  
+  // Show loading state on button
+  var origText=searchBtn.textContent||'Search';
+  searchBtn.textContent='Searching...';
+  searchBtn.disabled=true;
+  
+  var xhr=new XMLHttpRequest();
+  xhr.open('GET','/api/colleges'+qs,true);
+  xhr.setRequestHeader('Accept','application/json');
+  
+  xhr.onload=function(){
+    searchBtn.textContent=origText;
+    searchBtn.disabled=false;
+    
+    if(xhr.status>=200&&xhr.status<300){
+      try{
+        var resp=JSON.parse(xhr.responseText);
+        if(resp.success&&resp.data&&resp.data.length>0){
+          renderCollegeCards(resp.data);
+        }else{
+          noResults.style.display='block';
+        }
+      }catch(e){
+        searchError.style.display='block';
+      }
+    }else{
+      searchError.style.display='block';
+    }
+    
+    // Scroll to results
+    setTimeout(function(){
+      var target=document.getElementById('collegeResults');
+      if(!target||target.style.display==='none')target=document.getElementById('noResults');
+      if(!target||target.style.display==='none')target=document.getElementById('searchError');
+      if(target&&target.style.display!=='none'&&target.style.display!==''){
+        target.scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    },100);
+  };
+  
+  xhr.onerror=function(){
+    searchBtn.textContent=origText;
+    searchBtn.disabled=false;
+    searchError.style.display='block';
+  };
+  
+  xhr.send();
+}
+
+function renderCollegeCards(colleges){
+  resultsContainer.innerHTML='';
+  
+  colleges.forEach(function(c){
+    var subjectsHtml=c.subjects.map(function(s){
+      return '<span class="college-badge">'+s+'</span>';
+    }).join(' ');
+    
+    var amazonBadge=c.amazonPartner
+      ? '<span class="college-badge" style="background:rgba(255,153,0,0.15);color:#FF9900;border-color:rgba(255,153,0,0.3);">Amazon Partner</span>'
+      : '';
+    
+    var card=document.createElement('div');
+    card.className='college-card';
+    card.style.opacity='1';
+    card.style.transform='none';
+    
+    card.innerHTML=
+      '<h3>'+c.name+'</h3>'+
+      '<p style="color:#4A5568;font-size:12px;margin-bottom:8px;">'+c.town+', '+c.postcode+' &middot; '+c.region+'</p>'+
+      amazonBadge+' '+
+      '<p>'+c.description+'</p>'+
+      '<div class="college-stat">'+
+        '<span>'+c.placementHours+' hrs placement</span>'+
+        '<span>Ofsted: '+c.ofsted+'</span>'+
+        '<span>Satisfaction: '+c.studentSatisfaction+'%</span>'+
+      '</div>'+
+      '<div style="margin-top:10px;">'+subjectsHtml+'</div>'+
+      (c.website?'<p style="margin-top:10px;"><a href="'+c.website+'" target="_blank" style="color:#2E9E8E;font-size:13px;text-decoration:none;font-weight:600;">Visit website &rarr;</a></p>':'');
+    
+    resultsContainer.appendChild(card);
+  });
+  
+  resultsContainer.style.display='grid';
+}
+
+// Search button click
+if(searchBtn){
+  searchBtn.addEventListener('click',function(e){
+    e.preventDefault();
+    searchColleges();
+  });
+}
+
+// Search on Enter key in location field
+if(locationInput){
+  locationInput.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      searchColleges();
+    }
+  });
+}
+
+// "Start Your Search" CTA button scrolls to search form
+var ctaStartBtn=document.querySelector('.cta-btn.primary');
+if(ctaStartBtn){
+  ctaStartBtn.addEventListener('click',function(e){
+    e.preventDefault();
+    document.querySelector('.search-form').scrollIntoView({behavior:'smooth'});
+    setTimeout(function(){if(locationInput)locationInput.focus();},500);
+  });
+}
+</script>
+</body>
+</html>

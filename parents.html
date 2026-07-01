@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Information &#8212; Amazon T Levels</title>
+<style>/* ── RESET & BASE ──────────────────────────────────────────────────── */
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#F2F4F7;color:#1E2B3C;line-height:1.6;}
+ 
+/* ── MODAL ─────────────────────────────────────────────────────────── */
+.modal{display:none;position:fixed;z-index:2000;inset:0;background:rgba(30,43,60,0.6);backdrop-filter:blur(8px);justify-content:center;align-items:center;}
+.modal-content{background:#E8ECF2;width:90%;max-width:560px;padding:40px;border-radius:16px;border-top:4px solid #FF9900;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:popup 0.3s ease;color:#1E2B3C;}
+.modal-content h2{color:#1E2B3C;margin-bottom:6px;font-size:22px;font-weight:700;}
+.modal-subtitle{color:#4A5568;font-size:14px;margin-bottom:24px;}
+.close-btn{float:right;font-size:24px;cursor:pointer;color:#4A5568;line-height:1;transition:color 0.2s;}
+.close-btn:hover{color:#FF9900;}
+.modal-content input,.modal-content select,.modal-content textarea{width:100%;padding:12px 16px;margin-bottom:14px;border:1.5px solid #D2D7DF;border-radius:10px;background:white;color:#1E2B3C;font-size:15px;outline:none;transition:border-color 0.2s;}
+.modal-content input:focus,.modal-content select:focus,.modal-content textarea:focus{border-color:#2E9E8E;}
+.modal-content textarea{height:100px;resize:vertical;}
+.modal-submit{background:#FF9900;color:white;font-weight:700;padding:13px 28px;border:none;border-radius:10px;font-size:15px;cursor:pointer;width:100%;transition:background 0.2s,transform 0.15s;}
+.modal-submit:hover{background:#e68a00;transform:translateY(-1px);}
+@keyframes popup{from{transform:scale(0.9) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+ 
+/* ── NAVBAR ─────────────────────────────────────────────────────────── */
+.navbar{background:#1E2B3C;padding:0 24px;height:70px;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 20px rgba(0,0,0,0.25);}
+.logo{color:white;font-size:20px;font-weight:700;letter-spacing:-0.3px;white-space:nowrap;}
+.logo span{color:#FF9900;}
+.nav-links{display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:wrap;margin:0 24px;}
+.nav-links a{color:#D2D7DF;text-decoration:none;font-size:14px;font-weight:500;padding:8px 14px;border-radius:8px;transition:all 0.2s;}
+.nav-links a:hover{color:white;background:rgba(255,255,255,0.08);}
+.nav-links a.active{color:#FF9900;}
+.nav-tools{display:flex;gap:8px;align-items:center;margin-left:auto;}
+.logout-area{margin-right:auto;}
+.small-btn{background:none;color:#D2D7DF;padding:8px 10px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.small-btn:hover{color:white;background:rgba(255,255,255,0.08);}
+ 
+/* ── HERO ───────────────────────────────────────────────────────────── */
+.page-hero{margin:28px;background:#1E2B3C;border-radius:20px;padding:120px 48px;text-align:center;box-shadow:0 8px 40px rgba(30,43,60,0.15);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:40px;min-height:400px;}
+.page-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF9900,#2E9E8E);}
+.page-hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(30,43,60,0.92) 0%,rgba(30,43,60,0.75) 100%);z-index:1;}
+.page-hero-content{position:relative;z-index:2;flex:1;text-align:center;max-width:900px;}
+.page-hero-image{position:relative;z-index:2;flex:0 0 300px;display:flex;align-items:center;justify-content:center;}
+.page-hero-image img{width:100%;max-width:300px;height:auto;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.3);border:none;opacity:0.95;transition:opacity 0.3s,transform 0.3s;}
+.page-hero:hover .page-hero-image img{opacity:1;transform:scale(1.03);}
+.page-hero h1{font-size:56px;font-weight:800;letter-spacing:-1px;margin-bottom:20px;color:white;display:flex;align-items:center;justify-content:center;gap:14px;text-align:center;}
+.page-hero p{font-size:20px;max-width:800px;margin:0 auto;line-height:1.8;color:#D2D7DF;text-align:center;}
+ 
+/* ── SECTION LABELS ─────────────────────────────────────────────────── */
+.section-label{text-align:center;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#FF9900;margin:52px 0 10px;}
+.section-title{text-align:center;font-size:30px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;color:#1E2B3C;}
+.section-subtitle{text-align:center;font-size:15px;color:#4A5568;margin-bottom:32px;max-width:560px;margin-left:auto;margin-right:auto;}
+ 
+/* ── GRID ───────────────────────────────────────────────────────────── */
+.content-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:20px;padding:0 28px 32px;}
+ 
+/* ── INFO BOXES ─────────────────────────────────────────────────────── */
+.info-box{background:#1E2B3C;border-radius:16px;padding:28px;box-shadow:0 4px 16px rgba(0,0,0,0.12);color:white;transition:transform 0.25s,box-shadow 0.25s;border:1px solid rgba(255,255,255,0.05);position:relative;overflow:hidden;display:flex;flex-direction:column;height:100%;}
+.info-box:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.2);}
+.info-box-image{width:100%;height:220px;object-fit:cover;border-radius:12px;margin-bottom:16px;border:none;flex-shrink:0;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0.9;transition:opacity 0.3s,transform 0.3s;}
+.info-box:hover .info-box-image{opacity:1;transform:scale(1.02);}
+.info-box.hero-card{background-size:cover;background-position:center;background-repeat:no-repeat;}
+.info-box.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,rgba(30,43,60,0.92) 0%,rgba(30,43,60,0.85) 100%);border-radius:16px;z-index:1;}
+.info-box.hero-card>*{position:relative;z-index:2;}
+.info-box.hero-card .info-box-image{display:none;}
+.info-box h2{color:#FF9900;margin-bottom:12px;font-size:18px;font-weight:700;flex-shrink:0;}
+.info-box p{line-height:1.75;color:#D2D7DF;margin-bottom:10px;font-size:14px;flex-grow:1;}
+.info-box ul{list-style:none;padding:0;color:#D2D7DF;font-size:14px;flex-grow:1;}
+.info-box ul li{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;line-height:1.6;}
+.info-box .tag{display:inline-block;background:rgba(255,153,0,0.15);color:#FF9900;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(255,153,0,0.3);flex-shrink:0;}
+.svg-icon{display:inline-block;vertical-align:middle;flex-shrink:0;}
+.info-box ul{list-style:none;padding:0;color:#D2D7DF;font-size:14px;}
+.info-box ul li{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;line-height:1.6;}
+.info-box .tag{display:inline-block;background:rgba(255,153,0,0.15);color:#FF9900;font-size:10px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(255,153,0,0.3);}
+.svg-icon{display:inline-block;vertical-align:middle;flex-shrink:0;}
+ 
+/* ── ACCENT BANNER ──────────────────────────────────────────────────── */
+.accent-banner{margin:0 28px 32px;background:#1E2B3C;border-radius:20px;padding:52px 48px;text-align:center;color:white;position:relative;overflow:hidden;border:1px solid rgba(46,158,142,0.3);}
+.accent-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#2E9E8E,#FF9900);}
+.accent-banner h2{font-size:26px;font-weight:800;margin-bottom:12px;color:#E2E8F0;display:flex;align-items:center;justify-content:center;gap:12px;}
+.accent-banner>p{font-size:15px;max-width:700px;margin:0 auto 32px;line-height:1.8;color:#D2D7DF;}
+.step-row{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;margin-top:24px;}
+.step-card{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:22px 20px;width:180px;text-align:center;backdrop-filter:blur(4px);}
+.step-card .step-num{font-size:28px;font-weight:800;color:#FF9900;margin-bottom:8px;}
+.step-card p{font-size:13px;color:#D2D7DF;margin:0;line-height:1.6;}
+ 
+/* ── TABLE ──────────────────────────────────────────────────────────── */
+.comparison-wrap{padding:0 28px 36px;overflow-x:auto;}
+table{width:100%;border-collapse:collapse;background:#1E2B3C;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
+thead{background:#FF9900;}
+thead th{padding:16px 20px;text-align:left;font-size:13px;font-weight:700;color:white;letter-spacing:0.3px;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(46,158,142,0.08);}
+tbody td{padding:14px 20px;color:#D2D7DF;font-size:14px;line-height:1.5;vertical-align:middle;}
+tbody td:first-child{font-weight:600;color:#E2E8F0;font-size:13px;}
+ 
+/* ── CARD SECTION ───────────────────────────────────────────────────── */
+.card-section{margin:0 28px 32px;background:#1E2B3C;border-radius:20px;padding:48px 40px;border:1px solid rgba(46,158,142,0.2);}
+.card-section-header{text-align:center;margin-bottom:36px;}
+.card-section-header h2{font-size:26px;font-weight:800;color:#E2E8F0;margin-bottom:8px;}
+.card-section-header p{color:#D2D7DF;font-size:15px;max-width:640px;margin:0 auto;line-height:1.75;}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+.feature-card{background:#0F1622;border-radius:14px;padding:32px 24px;border-left:3px solid #2E9E8E;transition:transform 0.25s,box-shadow 0.25s;overflow:hidden;display:flex;flex-direction:column;align-items:center;text-align:center;height:100%;}
+.feature-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,0.25);}
+.feature-card-image{width:100px;height:100px;border-radius:50%;object-fit:cover;margin-bottom:20px;border:none;flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.15);opacity:0.9;transition:opacity 0.3s,transform 0.3s;}
+.feature-card:hover .feature-card-image{opacity:1;transform:scale(1.05);}
+.feature-card .f-icon{margin-bottom:14px;display:none;}
+.feature-card-content{padding:0;flex:1;display:flex;flex-direction:column;align-items:center;}
+.feature-card h3{color:#2E9E8E;font-size:16px;font-weight:700;margin-bottom:8px;flex-shrink:0;}
+.feature-card p{color:#D2D7DF;font-size:13px;line-height:1.65;flex-grow:1;}
+ 
+/* ── FAQ ────────────────────────────────────────────────────────────── */
+.faq-section{padding:0 28px 40px;}
+.faq-item{background:#1E2B3C;border-radius:12px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);}
+.faq-question{padding:18px 22px;font-weight:600;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s;color:#E2E8F0;}
+.faq-question:hover{background:rgba(255,255,255,0.04);}
+.arrow-svg{transition:transform 0.3s;flex-shrink:0;}
+.faq-answer{display:none;padding:0 22px 18px;color:#D2D7DF;line-height:1.75;font-size:14px;}
+.faq-item.open .faq-answer{display:block;}
+.faq-item.open .arrow-svg{transform:rotate(180deg);}
+ 
+/* ── CTA BANNER ─────────────────────────────────────────────────────── */
+.cta-strip{margin:0 28px 40px;background:linear-gradient(135deg,#FF9900 0%,#e68a00 100%);border-radius:20px;padding:52px 48px;text-align:center;color:white;position:relative;overflow:hidden;}
+.cta-strip::after{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:rgba(255,255,255,0.06);border-radius:50%;}
+.cta-strip h2{font-size:26px;font-weight:800;margin-bottom:12px;}
+.cta-strip p{font-size:15px;max-width:560px;margin:0 auto 28px;opacity:0.92;line-height:1.75;}
+.cta-btn-group{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.2s;}
+.cta-btn.primary{background:#1E2B3C;color:#FF9900;}
+.cta-btn.primary:hover{background:#0F1622;transform:translateY(-1px);}
+.cta-btn.outline{background:transparent;color:white;border:2px solid rgba(255,255,255,0.5);}
+.cta-btn.outline:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px);}
+ 
+/* ── FOOTER ─────────────────────────────────────────────────────────── */
+footer{background:#1E2B3C;color:#D2D7DF;text-align:center;padding:24px 28px;margin-top:60px;font-size:13px;border-top:1px solid rgba(255,255,255,0.06);}
+footer strong{color:#FF9900;}
+ 
+/* ── SCROLL ANIMATIONS ──────────────────────────────────────────────── */
+.info-box,.feature-card,.faq-item,.step-card,.accent-banner,.card-section,.page-hero,.section-title,.section-label,.section-subtitle,.cta-strip,table,.comparison-wrap{opacity:0;transform:translateY(28px);transition:opacity 0.55s ease,transform 0.55s ease;}
+.in-view{opacity:1!important;transform:translateY(0)!important;}
+.content-grid .info-box:nth-child(1){transition-delay:0.05s;}
+.content-grid .info-box:nth-child(2){transition-delay:0.12s;}
+.content-grid .info-box:nth-child(3){transition-delay:0.19s;}
+.content-grid .info-box:nth-child(4){transition-delay:0.26s;}
+.content-grid .info-box:nth-child(5){transition-delay:0.33s;}
+.content-grid .info-box:nth-child(6){transition-delay:0.40s;}
+.card-grid .feature-card:nth-child(1){transition-delay:0.05s;}
+.card-grid .feature-card:nth-child(2){transition-delay:0.12s;}
+.card-grid .feature-card:nth-child(3){transition-delay:0.19s;}
+.card-grid .feature-card:nth-child(4){transition-delay:0.26s;}
+.card-grid .feature-card:nth-child(5){transition-delay:0.33s;}
+.card-grid .feature-card:nth-child(6){transition-delay:0.40s;}
+.faq-section .faq-item:nth-child(1){transition-delay:0.05s;}
+.faq-section .faq-item:nth-child(2){transition-delay:0.10s;}
+.faq-section .faq-item:nth-child(3){transition-delay:0.15s;}
+.faq-section .faq-item:nth-child(4){transition-delay:0.20s;}
+.faq-section .faq-item:nth-child(5){transition-delay:0.25s;}
+.faq-section .faq-item:nth-child(6){transition-delay:0.30s;}
+.step-row .step-card:nth-child(1){transition-delay:0.08s;}
+.step-row .step-card:nth-child(2){transition-delay:0.16s;}
+.step-row .step-card:nth-child(3){transition-delay:0.24s;}
+.step-row .step-card:nth-child(4){transition-delay:0.32s;}
+ 
+ 
+/* ── CHATBOT ────────────────────────────────────────────────────────── */
+#chat-fab{position:fixed;bottom:28px;right:28px;width:54px;height:54px;border-radius:50%;background:#1E2B3C;color:white;border:2px solid #FF9900;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,0.3);z-index:9000;display:flex;align-items:center;justify-content:center;transition:transform 0.2s,background 0.2s;}
+#chat-fab:hover{transform:scale(1.08);background:#FF9900;}
+#chat-window{display:none;flex-direction:column;position:fixed;bottom:96px;right:28px;width:340px;max-height:480px;background:#E8ECF2;border:1px solid rgba(30,43,60,0.15);border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,0.25);z-index:9001;overflow:hidden;animation:chatPop 0.25s ease;}
+@keyframes chatPop{from{transform:scale(0.9) translateY(12px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+#chat-header{background:#1E2B3C;color:white;padding:14px 18px;font-weight:700;font-size:14px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;}
+#chat-close{background:none;border:none;color:#D2D7DF;font-size:18px;cursor:pointer;padding:0;transition:color 0.2s;}
+#chat-close:hover{color:white;}
+#chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{max-width:82%;padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;word-break:break-word;}
+.chat-msg.bot{background:#1E2B3C;color:#E2E8F0;align-self:flex-start;border-bottom-left-radius:4px;}
+.chat-msg.user{background:#FF9900;color:white;align-self:flex-end;border-bottom-right-radius:4px;}
+.chat-msg.typing{color:#4A5568;font-style:italic;background:#1E2B3C;align-self:flex-start;}
+#chat-input-row{display:flex;padding:10px 12px;gap:8px;background:#E8ECF2;flex-shrink:0;border-top:1px solid #D2D7DF;}
+#chat-input{flex:1;padding:9px 14px;border-radius:20px;border:1.5px solid #D2D7DF;background:white;color:#1E2B3C;font-size:14px;outline:none;transition:border-color 0.2s;}
+#chat-input:focus{border-color:#2E9E8E;}
+#chat-send{background:#FF9900;border:none;color:white;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
+#chat-send:hover{background:#e68a00;}
+ 
+/* ── DYSLEXIC FONT ─────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+.dyslexic-font, .dyslexic-font * {
+  font-family: 'OpenDyslexic', 'Segoe UI', Arial, sans-serif !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+/* ── SETTINGS MODAL ────────────────────────────────────────────────── */
+.settings-btn{padding:10px 20px;background:white;color:#1E2B3C;border:1.5px solid #D2D7DF;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;min-width: 60px;}
+.settings-btn:hover{border-color:#2E9E8E;color:#2E9E8E;}
+.settings-btn.active{background:#2E9E8E;color:white;border-color:#2E9E8E;}
+.settings-btn[data-action="textSize"]:nth-child(1){font-size: 12px;}
+.settings-btn[data-action="textSize"]:nth-child(2){font-size: 16px;}
+.settings-btn[data-action="textSize"]:nth-child(3){font-size: 20px;}
+
+/* ── HIGH CONTRAST MODE ────────────────────────────────────────────── */
+.high-contrast{background:#000000 !important;color:#FFFFFF !important;}
+.high-contrast .navbar{background:#000000 !important;border-bottom: 2px solid #FFFF00 !important;}
+.high-contrast .page-hero{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .page-hero h1{color:#FFFF00 !important;}
+.high-contrast .page-hero p{color:#FFFFFF !important;}
+.high-contrast .info-box{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFFFF !important;}
+.high-contrast .info-box h2{color:#FFFF00 !important;}
+.high-contrast .info-box p{color:#FFFFFF !important;}
+.high-contrast .info-box ul{color:#FFFFFF !important;}
+.high-contrast .info-box .tag{background:#FFFF00 !important;color:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .section-title{color:#FFFF00 !important;}
+.high-contrast .section-subtitle{color:#FFFFFF !important;}
+.high-contrast .accent-banner{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .accent-banner h2{color:#FFFF00 !important;}
+.high-contrast .accent-banner p{color:#FFFFFF !important;}
+.high-contrast .card-section{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .feature-card{background:#000000 !important;border-left: 3px solid #FFFF00 !important;}
+.high-contrast .feature-card h3{color:#FFFF00 !important;}
+.high-contrast .feature-card p{color:#FFFFFF !important;}
+.high-contrast .faq-item{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .faq-question{color:#FFFF00 !important;}
+.high-contrast .faq-answer{color:#FFFFFF !important;}
+.high-contrast .cta-strip{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .cta-strip h2{color:#FFFF00 !important;}
+.high-contrast .cta-strip p{color:#FFFFFF !important;}
+.high-contrast footer{background:#000000 !important;border-top: 2px solid #FFFF00 !important;}
+.high-contrast .modal-content{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFFFF !important;}
+.high-contrast .modal-content h2{color:#FFFF00 !important;}
+.high-contrast .close-btn{color:#FFFFFF !important;}
+.high-contrast .close-btn:hover{color:#FFFF00 !important;}
+.high-contrast .chat-msg.bot{background:#000000 !important;color:#FFFFFF !important;border: 1px solid #FFFF00 !important;}
+.high-contrast .chat-msg.user{background:#FFFF00 !important;color:#000000 !important;}
+.high-contrast #chat-header{background:#000000 !important;border-bottom: 2px solid #FFFF00 !important;}
+.high-contrast #chat-fab{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFF00 !important;}
+.high-contrast .btn-submit{background:#FFFF00 !important;color:#000000 !important;}
+.high-contrast .form-group label{color:#FFFF00 !important;}
+.high-contrast .form-group input,.high-contrast .form-group select{background:#000000 !important;color:#FFFFFF !important;border: 2px solid #FFFF00 !important;}
+
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  DARK MODE — Applied to every page                              ║
+   ║  Palette:                                                       ║
+   ║    Main bg     #0F172A   Navbar      #162033                    ║
+   ║    Cards       #1E293B   Hero        #1B263B                    ║
+   ║    Primary txt #F8FAFC   Secondary   #CBD5E1                    ║
+   ║    Accent      #FF9900   Hover acc   #FFB84D                    ║
+   ║    Borders     #334155                                          ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* Base */
+.dark-mode,
+html.dark-mode body{background:#0F172A!important;color:#F8FAFC!important;}
+
+/* Navbar */
+.dark-mode .navbar{background:#162033!important;box-shadow:0 2px 20px rgba(0,0,0,0.5)!important;border-bottom:1px solid #334155!important;}
+.dark-mode .logo{color:#F8FAFC!important;}
+.dark-mode .logo span{color:#FF9900!important;}
+.dark-mode .nav-links a{color:#CBD5E1!important;}
+.dark-mode .nav-links a:hover{color:#F8FAFC!important;background:rgba(255,255,255,0.07)!important;}
+.dark-mode .nav-links a.active{color:#FF9900!important;}
+.dark-mode .small-btn{color:#CBD5E1!important;}
+.dark-mode .small-btn:hover{color:#FFB84D!important;background:rgba(255,255,255,0.07)!important;}
+
+/* Hero */
+.dark-mode .page-hero{background:#1B263B!important;box-shadow:0 8px 40px rgba(0,0,0,0.5)!important;}
+.dark-mode .page-hero h1{color:#F8FAFC!important;}
+.dark-mode .page-hero p{color:#CBD5E1!important;}
+
+/* Section labels */
+.dark-mode .section-label{color:#FF9900!important;}
+.dark-mode .section-title{color:#F8FAFC!important;}
+.dark-mode .section-subtitle{color:#CBD5E1!important;}
+
+/* Info boxes / general cards */
+.dark-mode .info-box{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .info-box h2{color:#FF9900!important;}
+.dark-mode .info-box p{color:#CBD5E1!important;}
+.dark-mode .info-box ul{color:#CBD5E1!important;}
+.dark-mode .info-box .tag{background:rgba(255,153,0,0.15)!important;color:#FF9900!important;border-color:rgba(255,153,0,0.3)!important;}
+
+/* Accent banner */
+.dark-mode .accent-banner{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .accent-banner h2{color:#F8FAFC!important;}
+.dark-mode .accent-banner>p{color:#CBD5E1!important;}
+.dark-mode .step-card{background:rgba(255,255,255,0.04)!important;border-color:#334155!important;}
+.dark-mode .step-card p{color:#CBD5E1!important;}
+
+/* Card section */
+.dark-mode .card-section{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .card-section-header h2{color:#F8FAFC!important;}
+.dark-mode .card-section-header p{color:#CBD5E1!important;}
+.dark-mode .feature-card{background:#0F172A!important;border-left-color:#2E9E8E!important;}
+.dark-mode .feature-card h3{color:#2E9E8E!important;}
+.dark-mode .feature-card p{color:#CBD5E1!important;}
+
+/* FAQ */
+.dark-mode .faq-item{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .faq-question{color:#F8FAFC!important;}
+.dark-mode .faq-question:hover{background:rgba(255,255,255,0.04)!important;}
+.dark-mode .faq-answer{color:#CBD5E1!important;}
+
+/* Table */
+.dark-mode table{background:#1E293B!important;box-shadow:0 4px 20px rgba(0,0,0,0.4)!important;}
+.dark-mode tbody tr{border-bottom-color:#334155!important;}
+.dark-mode tbody td{color:#CBD5E1!important;}
+.dark-mode tbody td:first-child{color:#F8FAFC!important;}
+.dark-mode tbody tr:hover{background:rgba(46,158,142,0.1)!important;}
+
+/* CTA strip — keep the orange gradient, just ensure text readable */
+.dark-mode .cta-strip{background:linear-gradient(135deg,#FF9900 0%,#e68a00 100%)!important;}
+.dark-mode .cta-strip h2{color:#0F172A!important;}
+.dark-mode .cta-strip p{color:#0F172A!important;opacity:0.9!important;}
+.dark-mode .cta-btn.primary{background:#0F172A!important;color:#FF9900!important;}
+.dark-mode .cta-btn.primary:hover{background:#162033!important;}
+.dark-mode .cta-btn.outline{color:#0F172A!important;border-color:rgba(15,23,42,0.5)!important;}
+.dark-mode .cta-btn.outline:hover{background:rgba(15,23,42,0.15)!important;}
+
+/* Footer */
+.dark-mode footer{background:#162033!important;color:#CBD5E1!important;border-top-color:#334155!important;}
+.dark-mode footer strong{color:#FF9900!important;}
+
+/* Contact / generic modal */
+.dark-mode .modal-content{background:#1E293B!important;color:#F8FAFC!important;border-top-color:#FF9900!important;}
+.dark-mode .modal-content h2{color:#F8FAFC!important;}
+.dark-mode .modal-content h3{color:#F8FAFC!important;}
+.dark-mode .modal-subtitle{color:#CBD5E1!important;}
+.dark-mode .close-btn{color:#CBD5E1!important;}
+.dark-mode .close-btn:hover{color:#FFB84D!important;}
+.dark-mode .modal-content input,
+.dark-mode .modal-content select,
+.dark-mode .modal-content textarea{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .modal-content input:focus,
+.dark-mode .modal-content select:focus,
+.dark-mode .modal-content textarea:focus{border-color:#2E9E8E!important;}
+.dark-mode .modal-content input::placeholder,
+.dark-mode .modal-content textarea::placeholder{color:#64748B!important;}
+.dark-mode .modal-content option{background:#1E293B!important;color:#F8FAFC!important;}
+
+/* Settings modal interior */
+.dark-mode #languageSelect{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode label span,
+.dark-mode #reduceMotion+span{color:#F8FAFC!important;}
+.dark-mode .settings-btn{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .settings-btn:hover{border-color:#FFB84D!important;color:#FFB84D!important;}
+.dark-mode .settings-btn.active{background:#2E9E8E!important;color:white!important;border-color:#2E9E8E!important;}
+
+/* Chatbot */
+.dark-mode #chat-fab{background:#162033!important;border-color:#FF9900!important;}
+.dark-mode #chat-fab:hover{background:#FF9900!important;}
+.dark-mode #chat-window{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode #chat-header{background:#162033!important;}
+.dark-mode #chat-messages{background:#1E293B!important;}
+.dark-mode .chat-msg.bot{background:#162033!important;color:#F8FAFC!important;}
+.dark-mode .chat-msg.typing{background:#162033!important;color:#CBD5E1!important;}
+.dark-mode #chat-input-row{background:#1E293B!important;border-top-color:#334155!important;}
+.dark-mode #chat-input{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode #chat-input::placeholder{color:#64748B!important;}
+
+
+/* ── REDUCED MOTION ────────────────────────────────────────────────── */
+.reduce-motion .info-box,
+.reduce-motion .feature-card,
+.reduce-motion .faq-item,
+.reduce-motion .step-card,
+.reduce-motion .accent-banner,
+.reduce-motion .card-section,
+.reduce-motion .page-hero,
+.reduce-motion .section-title,
+.reduce-motion .section-label,
+.reduce-motion .section-subtitle,
+.reduce-motion .cta-strip,
+.reduce-motion table,
+.reduce-motion .comparison-wrap{transition: none !important; animation: none !important; opacity: 1 !important; transform: none !important;}
+.reduce-motion .arrow-svg{transition: none !important;}
+.reduce-motion #chat-window{animation: none !important;}
+.reduce-motion .modal-content{animation: none !important;}
+
+/* ── TEXT SIZE VARIANTS ────────────────────────────────────────────── */
+.text-small{font-size: 14px;}
+.text-small .page-hero h1{font-size: 36px;}
+.text-small .page-hero p{font-size: 15px;}
+.text-small .section-title{font-size: 24px;}
+.text-small .info-box p,.text-small .info-box ul{font-size: 13px;}
+.text-small .faq-question{font-size: 14px;}
+.text-small tbody td{font-size: 13px;}
+
+.text-large{font-size: 18px;}
+.text-large .page-hero h1{font-size: 52px;}
+.text-large .page-hero p{font-size: 19px;}
+.text-large .section-title{font-size: 34px;}
+.text-large .info-box p,.text-large .info-box ul{font-size: 17px;}
+.text-large .faq-question{font-size: 17px;}
+.text-large tbody td{font-size: 16px;}
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────────── */
+@media(max-width:768px){
+    .navbar{padding:0 16px;height:auto;flex-wrap:wrap;gap:10px;padding:12px 16px;}
+    .page-hero{margin:16px;padding:40px 24px;}
+    .page-hero h1{font-size:32px;}
+    .content-grid{padding:0 16px 24px;}
+    .comparison-wrap,.faq-section{padding:0 16px 24px;}
+    .accent-banner,.card-section,.cta-strip{margin:0 16px 24px;padding:36px 24px;}
+}
+</style>
+</head>
+<body>
+<div id="contactModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <h2 data-i18n="getInTouch">Get in Touch</h2>
+    <p class="modal-subtitle" data-i18n="respondTime">We typically respond within one working day.</p>
+    <form id="contactForm">
+      <input type="text" id="contactName" placeholder="Your name" required>
+      <input type="email" id="contactEmail" placeholder="Email address" required>
+      <select id="contactSubject" required>
+        <option value="" data-i18n="helpWith">What do you need help with?</option>
+        <option value="T Levels Information" data-i18n="tLevelsInfo">T Levels Information</option>
+        <option value="Industry Placements" data-i18n="industryPlacements">Industry Placements</option>
+        <option value="School Partnership" data-i18n="schoolPartnership">School Partnership</option>
+        <option value="Technical Support" data-i18n="techSupport">Technical Support</option>
+        <option value="Other" data-i18n="other">Other</option>
+      </select>
+      <textarea id="contactMessage" placeholder="Describe your enquiry..." required></textarea>
+      <button type="submit" class="modal-submit" data-i18n="sendMessage">Send Message</button>
+    </form>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal">
+  <div class="modal-content" style="max-width: 600px;">
+    <span class="close-btn">&times;</span>
+    <h2 data-i18n="accessibilitySettings">Accessibility Settings</h2>
+    <p class="modal-subtitle" data-i18n="customizeExperience">Customize your experience</p>
+    
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="textSize">Text Size</h3>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="settings-btn" data-action="textSize" data-value="small">A</button>
+        <button class="settings-btn active" data-action="textSize" data-value="medium">A</button>
+        <button class="settings-btn" data-action="textSize" data-value="large">A</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="displayMode">Display Mode</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="displayMode" data-value="normal" data-i18n="normal">Normal</button>
+        <button class="settings-btn" data-action="displayMode" data-value="dark" data-i18n="darkMode">Dark Mode</button>
+        <button class="settings-btn" data-action="displayMode" data-value="highContrast" data-i18n="highContrast">High Contrast</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="dyslexicFont">Dyslexic Friendly Font</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="dyslexicFont" data-value="off" data-i18n="off">Off</button>
+        <button class="settings-btn" data-action="dyslexicFont" data-value="on" data-i18n="on">On</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="language">Language</h3>
+      <select id="languageSelect" style="width: 100%; padding: 10px 14px; border: 1.5px solid #D2D7DF; border-radius: 8px; font-size: 14px; background: white; color: #1E2B3C;">
+        <option value="en">English</option>
+        <option value="fr">Français (French)</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="de">Deutsch (German)</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;" data-i18n="motion">Motion</h3>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="reduceMotion" style="width: 18px; height: 18px; cursor: pointer;">
+        <span style="font-size: 14px; color: #1E2B3C;" data-i18n="reduceMotion">Reduce motion (disable animations)</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="logout-area"><button id="logoutBtn" class="small-btn" aria-label="Sign out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span data-i18n="signOut">Sign out</span></button></div>
+  <div class="logo">Amazon <span>T Levels</span></div>
+  <div class="nav-links">
+    <a href="Main.html" data-i18n="home">Home</a>
+    <a href="students.html" data-i18n="students">Students</a>
+    <a href="parents.html" class="active" data-i18n="parents">Parents</a>
+    <a href="schools.html" data-i18n="schools">Schools</a>
+    <a href="advisors.html" data-i18n="advisors">Advisors</a>
+    <a href="find-colleges.html" data-i18n="findCollegesNav">Find Colleges</a>
+    <a href="#" id="contactBtn" data-i18n="contact">Contact</a>
+  </div>
+  <div class="nav-tools">
+    <button id="settingsBtn" class="small-btn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+</nav>
+ 
+<div class="page-hero" style="background-image: url('https://images.unsplash.com/photo-1609220136736-443140cffec6?w=1200&h=600&fit=crop'); background-size: cover; background-position: center;">
+  <div class="page-hero-content">
+    <h1>
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span data-i18n="parentHub">Parent Information</span>
+    </h1>
+    <p data-i18n="parentHubDesc">Everything you need to understand about T Levels &#8212; why they matter, what the Amazon placement involves, and how to support your child through the programme.</p>
+  </div>
+</div>
+
+<p class="section-label" data-i18n="theQualification">The Qualification</p>
+<h2 class="section-title" data-i18n="whatAreTLevels">What Are T Levels?</h2>
+<p class="section-subtitle" data-i18n="whatAreTLevelsDesc">The essentials every parent should know</p>
+ 
+<div class="content-grid">
+  <div class="info-box">
+    <img class="info-box-image" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=200&fit=crop" alt="T Levels overview for parents" onerror="this.style.display='none'">
+    <span class="tag" data-i18n="overview">Overview</span>
+    <h2 data-i18n="newQualification">A New Kind of Qualification</h2>
+    <p data-i18n="tLevelsParentDesc1">T Levels are two-year technical qualifications for 16&#8211;19 year olds. Co-designed with major employers, they combine rigorous classroom learning with a real industry placement.</p>
+    <p data-i18n="tLevelsParentDesc2">They carry up to 168 UCAS points &#8212; equivalent to 3 A Levels &#8212; and are accepted by universities and employers across the UK.</p>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="structure">Structure</span>
+    <h2 data-i18n="howTimeSplit">How Time Is Split</h2>
+    <ul>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="9" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span><strong data-i18n="classroom">80% in the classroom</strong> <span data-i18n="classroomDesc">&#8212; knowledge and technical skills</span></span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="13" rx="2"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg><span><strong data-i18n="industry">20% industry placement</strong> <span data-i18n="industryDesc">&#8212; 315+ hours with a real employer</span></span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span><strong data-i18n="exams">Assessed by exams and practical assignments</strong></span></li>
+    </ul>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="outcomes">Outcomes</span>
+    <h2 data-i18n="whatDoorsOpen">What Doors It Opens</h2>
+    <ul>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="uniOutcome">University &#8212; up to 168 UCAS points</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="apprenticeshipOutcome">Higher or degree apprenticeship</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="employmentOutcome">Skilled employment directly</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="amazonProgression">Progression within Amazon itself</span></li>
+    </ul>
+  </div>
+</div>
+ 
+<div class="accent-banner">
+  <h2>
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+    <span data-i18n="thePlacement">The Amazon Placement</span>
+  </h2>
+  <p data-i18n="placementDesc">The industry placement is what makes T Levels different from any other post-16 qualification. Here is what your child will experience.</p>
+  <div class="step-row">
+    <div class="step-card"><div class="step-num" data-i18n="year1">Year 1</div><p data-i18n="year1ParentDesc">Mostly classroom-based. Your child builds knowledge before entering the workplace.</p></div>
+    <div class="step-card"><div class="step-num">315+</div><p data-i18n="placementHoursParentDesc">Minimum hours spent with Amazon &#8212; roughly 45 full working days across the programme.</p></div>
+    <div class="step-card"><div class="step-num" data-i18n="mentor">Mentor</div><p data-i18n="mentorDesc">Amazon assigns each student a personal workplace mentor throughout the placement.</p></div>
+    <div class="step-card"><div class="step-num" data-i18n="year2">Year 2</div><p data-i18n="year2ParentDesc">More placement time, applying classroom learning in real Amazon projects and teams.</p></div>
+  </div>
+</div>
+ 
+<p class="section-label" data-i18n="yourRole">Your Role</p>
+<h2 class="section-title" data-i18n="howToSupport">How to Support Your Child</h2>
+<p class="section-subtitle" data-i18n="howToSupportDesc">Practical ways to help throughout the T Level journey</p>
+ 
+<div class="content-grid">
+  <div class="info-box">
+    <span class="tag" data-i18n="dayToDay">Day to Day</span>
+    <h2 data-i18n="practicalSupport">Practical Support</h2>
+    <ul>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="supportTip1">Help plan travel to placement on time</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="supportTip2">Encourage them to write reflections after placement days</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="supportTip3">Ask about what they did &#8212; it builds confidence</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="supportTip4">Ensure appropriate attire for placement days</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="supportTip5">Support exam revision &#8212; these are real exams</span></li>
+    </ul>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="conversations">Conversations</span>
+    <h2 data-i18n="talkingFuture">Talking About the Future</h2>
+    <p data-i18n="conversationsDesc">T Levels work best when students have a sense of direction. Open conversations about goals are one of the most valuable things you can do.</p>
+    <ul>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="convoTip1">Ask what they enjoy most at Amazon</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="convoTip2">Discuss whether uni, apprenticeship, or work appeals</span></li>
+      <li><svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg><span data-i18n="convoTip3">Celebrate workplace achievements &#8212; it is real work</span></li>
+    </ul>
+  </div>
+  <div class="info-box">
+    <span class="tag" data-i18n="concerns">Concerns</span>
+    <h2 data-i18n="ifSomethingWrong">If Something Is Not Right</h2>
+    <p data-i18n="concernsDesc1">If your child is struggling &#8212; with the placement, the exams, or anything else &#8212; the first step is to contact their T Level tutor at school or college.</p>
+    <p data-i18n="concernsDesc2">Amazon has a student wellbeing process and will work with the school to resolve issues early. No concern is too small to raise. The most important thing is that your child keeps attending and communicates openly.</p>
+  </div>
+</div>
+ 
+<p class="section-label" data-i18n="comparison">Comparison</p>
+<h2 class="section-title" data-i18n="comparisonTitle">T Levels vs Other Options</h2>
+<p class="section-subtitle" data-i18n="comparisonDesc">How does a T Level compare to what your child might otherwise consider?</p>
+ 
+<div class="comparison-wrap">
+  <table>
+    <thead><tr><th data-i18n="feature">Feature</th><th data-i18n="tLevel">T Level</th><th data-i18n="aLevels">A Levels</th><th data-i18n="btc">BTEC</th><th data-i18n="apprenticeship">Apprenticeship</th></tr></thead>
+    <tbody>
+      <tr><td data-i18n="duration">Duration</td><td>2 years</td><td>2 years</td><td>1&#8211;3 years</td><td>1&#8211;4 years</td></tr>
+      <tr><td data-i18n="workExperience">Work Experience</td><td><span style="color:#2E9E8E;font-weight:700;" data-i18n="builtIn">Built-in (315+ hrs)</span></td><td><span style="color:#e74c3c;" data-i18n="notIncluded">Not included</span></td><td data-i18n="sometimes">Sometimes</td><td><span style="color:#2E9E8E;font-weight:700;" data-i18n="central">Central to course</span></td></tr>
+      <tr><td data-i18n="uniEntry">University Entry</td><td data-i18n="mostUni">Most universities</td><td data-i18n="allUni">All universities</td><td data-i18n="widelyAccepted">Widely accepted</td><td data-i18n="degreeRoutes">Degree routes exist</td></tr>
+      <tr><td data-i18n="paid">Paid?</td><td data-i18n="sometimesPaid">Sometimes</td><td data-i18n="no">No</td><td data-i18n="no">No</td><td><span style="color:#2E9E8E;font-weight:700;" data-i18n="yesPaid">Yes &#8212; national minimum</span></td></tr>
+      <tr><td data-i18n="assessmentTable">Assessment</td><td data-i18n="allThree">Exams + projects + placement</td><td data-i18n="mainlyExams">Mainly exams</td><td data-i18n="mainlyCoursework">Mainly coursework</td><td data-i18n="onTheJob">On-the-job assessments</td></tr>
+      <tr><td data-i18n="bestFor">Best For</td><td data-i18n="appliedLearners">Applied, industry-focused learners</td><td data-i18n="traditionalAcademic">Traditional academic degrees</td><td data-i18n="courseworkPref">Coursework preference</td><td data-i18n="readyToWork">Students ready to work full-time</td></tr>
+    </tbody>
+  </table>
+</div>
+ 
+<div class="card-section">
+  <div class="card-section-header">
+    <h2 data-i18n="whyAmazonDifference">Why Amazon Makes the Difference</h2>
+    <p data-i18n="whyAmazonDesc">The quality of the placement provider matters enormously. Here is what your child gets specifically by placing with Amazon.</p>
+  </div>
+  <div class="card-grid">
+    <div class="feature-card">
+      <img class="feature-card-image" src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=300&h=300&fit=crop" alt="Real work experience at Amazon" onerror="this.style.display='none'">
+      <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div>
+      <h3 data-i18n="realWork">Real Work, Real Responsibility</h3>
+      <p data-i18n="realWorkDesc">Students work inside actual Amazon operations with real tasks, real colleagues, and real deadlines &#8212; not a simulation.</p>
+    </div>
+    <div class="feature-card">
+      <img class="feature-card-image" src="https://images.unsplash.com/photo-1522202176988-66273c2b55e9?w=300&h=300&fit=crop" alt="Dedicated mentor supporting student" onerror="this.style.display='none'">
+      <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg></div>
+      <h3 data-i18n="namedMentor">A Named Mentor</h3>
+      <p data-i18n="namedMentorDesc">Every student has a dedicated Amazon mentor &#8212; a real person setting goals and giving structured feedback throughout.</p>
+    </div>
+    <div class="feature-card">
+      <img class="feature-card-image" src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=300&h=300&fit=crop" alt="CV building and career advantage" onerror="this.style.display='none'">
+      <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+      <h3 data-i18n="cvAdvantage">A CV That Stands Out</h3>
+      <p data-i18n="cvAdvantageDesc">Amazon on a CV at 18 is a significant advantage. Universities and employers recognise it as proof of real-world capability.</p>
+    </div>
+    <div class="feature-card">
+      <img class="feature-card-image" src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=300&h=300&fit=crop" alt="Transferable skills development" onerror="this.style.display='none'">
+      <div class="f-icon"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg></div>
+      <h3 data-i18n="skillsForLife">Skills for Life</h3>
+      <p data-i18n="skillsForLifeDesc">Communication, teamwork, and problem-solving under pressure &#8212; skills that help in every job, for the rest of their career.</p>
+    </div>
+  </div>
+</div>
+ 
+<p class="section-label" data-i18n="faqs">FAQs</p>
+<h2 class="section-title" data-i18n="faqTitle">Parent Questions</h2>
+<p class="section-subtitle" data-i18n="faqDesc">What parents ask us most often</p>
+ 
+<div class="faq-section">
+  <div class="faq-item"><div class="faq-question" data-i18n="faq1Question">Is a T Level as good as A Levels?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq1Answer">T Levels and A Levels are equivalent in UCAS points (up to 168 each) and both accepted by the vast majority of UK universities. T Levels have the significant advantage of including real work experience. For students who know their industry and learn well through doing, a T Level can be a stronger choice than A Levels.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq2Question">Will my child be safe and supported at Amazon?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq2Answer">Yes. Amazon has robust safeguarding and health & safety processes for all T Level students. Every student has a dedicated mentor, and the placement is coordinated with their school. Schools carry out health & safety checks before any student begins. If your child has any concerns, they can speak to their mentor, their tutor, or contact us directly.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq3Question">Will my child be paid for the placement?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq3Answer">Payment is not a legal requirement for T Level placements and varies by programme. Some Amazon placements include expenses or payment &#8212; ask your child&#39;s school or provider about the specific arrangement before the placement begins.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq4Question">What if my child does not enjoy their subject or placement?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq4Answer">Encourage your child to speak to their T Level tutor as early as possible. Placements can sometimes be adjusted if there is a genuine mismatch, and support can be put in place. The important thing is to raise concerns early rather than waiting.</div></div>
+  <div class="faq-item"><div class="faq-question" data-i18n="faq5Question">Can my child still go to a top university after a T Level?<svg class="arrow-svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E9E8E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-answer" data-i18n="faq5Answer">Most universities accept T Levels, including many Russell Group institutions. However, entry requirements vary by course and university, so it is important to check early. Some universities now actively seek T Level applicants because of the work experience they bring.</div></div>
+</div>
+ 
+<div class="cta-strip">
+  <h2 data-i18n="stillHaveQuestions">Still Have Questions?</h2>
+  <p data-i18n="ctaParentDesc">We are here to help parents understand every part of the T Level journey. Get in touch or find T Level providers near you.</p>
+  <div class="cta-btn-group">
+    <a href="#" id="ctaContactBtn" class="cta-btn primary" data-i18n="contactUs">Contact Us</a>
+    <a href="find-colleges.html" class="cta-btn outline" data-i18n="findProviders">Find Providers Near You</a>
+  </div>
+</div>
+ 
+<footer data-i18n="footerText">&#169; 2026 <strong>Amazon T Levels Hub</strong> &#8212; Supporting Future Careers</footer>
+<button id="chat-fab" title="Chat"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+<div id="chat-window"><div id="chat-header"><span data-i18n="chatTitle">T Levels Assistant</span><button id="chat-close">&#x2715;</button></div><div id="chat-messages"><div class="chat-msg bot" data-i18n="chatWelcome">Hi! I am the T Levels Assistant. Ask me anything about T Levels or Amazon placements.</div></div><div id="chat-input-row"><input id="chat-input" type="text" placeholder="Ask a question..." autocomplete="off" maxlength="500"><button id="chat-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div></div>
+<script src="translations.js"></script>
+<script>
+const html=document.documentElement;
+const modal=document.getElementById('contactModal');
+function openModal(){modal.style.display='flex';}
+document.getElementById('contactBtn').addEventListener('click',function(e){e.preventDefault();openModal();});
+const ctaBtn=document.getElementById('ctaContactBtn');if(ctaBtn)ctaBtn.addEventListener('click',function(e){e.preventDefault();openModal();});
+document.querySelector('.close-btn').addEventListener('click',function(){modal.style.display='none';});
+window.addEventListener('click',function(e){if(e.target===modal)modal.style.display='none';});
+document.getElementById('contactForm').addEventListener('submit',async function(e){e.preventDefault();const name=document.getElementById('contactName').value;const email=document.getElementById('contactEmail').value;const subject=document.getElementById('contactSubject').value;const message=document.getElementById('contactMessage').value;const submitBtn=this.querySelector('.modal-submit');const origText=submitBtn.textContent;submitBtn.textContent='Sending...';submitBtn.disabled=true;try{const r=await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,subject,message})});const data=await r.json();if(data.success){alert('Thank you! We have received your enquiry. A confirmation email has been sent to '+email);}else{alert('Something went wrong. Please try again later.');}}catch(err){alert('Connection error. Please try again later.');}submitBtn.textContent=origText;submitBtn.disabled=false;modal.style.display='none';this.reset();});
+window.addEventListener('load',function(){if(!localStorage.getItem('authToken'))window.location.href='index.html';});
+document.getElementById('logoutBtn').addEventListener('click',function(){localStorage.removeItem('authToken');window.location.href='index.html';});
+const obs=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in-view');obs.unobserve(x.target);}});},{threshold:0.08});
+document.querySelectorAll('.info-box,.feature-card,.faq-item,.step-card,.accent-banner,.card-section,.page-hero,.section-title,.section-label,.section-subtitle,.cta-strip,table,.comparison-wrap').forEach(function(el){el.style.opacity='0';el.style.transform='translateY(28px)';obs.observe(el);});
+document.querySelectorAll('.faq-question').forEach(function(q){q.addEventListener('click',function(){const item=this.parentElement;const wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!wasOpen)item.classList.add('open');});});
+
+// Settings Modal
+const settingsModal=document.getElementById('settingsModal');
+const settingsBtn=document.getElementById('settingsBtn');
+if(settingsBtn){settingsBtn.addEventListener('click',function(e){e.preventDefault();settingsModal.style.display='flex';});}
+if(settingsModal){settingsModal.querySelector('.close-btn').addEventListener('click',function(){settingsModal.style.display='none';});window.addEventListener('click',function(e){if(e.target===settingsModal)settingsModal.style.display='none';});}
+const settingsButtons=document.querySelectorAll('.settings-btn');
+const languageSelect=document.getElementById('languageSelect');
+const reduceMotionCheckbox=document.getElementById('reduceMotion');
+settingsButtons.forEach(function(button){button.addEventListener('click',function(){const action=this.dataset.action;const value=this.dataset.value;if(action==='textSize'){html.classList.remove('text-small','text-large');if(value==='small')html.classList.add('text-small');if(value==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('textSize',value);}if(action==='displayMode'){html.classList.remove('dark-mode','high-contrast');if(value==='dark')html.classList.add('dark-mode');if(value==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('displayMode',value);}if(action==='dyslexicFont'){if(value==='on'){html.classList.add('dyslexic-font');}else{html.classList.remove('dyslexic-font');}settingsButtons.forEach(function(btn){if(btn.dataset.action==='dyslexicFont')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('dyslexicFont',value);}});});
+if(languageSelect){languageSelect.addEventListener('change',function(){localStorage.setItem('language',this.value);updateLanguage(this.value,'parents');});}
+if(reduceMotionCheckbox){reduceMotionCheckbox.addEventListener('change',function(){if(this.checked){html.classList.add('reduce-motion');localStorage.setItem('reduceMotion','enabled');}else{html.classList.remove('reduce-motion');localStorage.setItem('reduceMotion','disabled');}});}
+window.addEventListener('load',function(){const savedTextSize=localStorage.getItem('textSize');if(savedTextSize){html.classList.remove('text-small','text-large');if(savedTextSize==='small')html.classList.add('text-small');if(savedTextSize==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize'&&btn.dataset.value===savedTextSize)btn.classList.add('active');else if(btn.dataset.action==='textSize')btn.classList.remove('active');});}const savedDisplayMode=localStorage.getItem('displayMode');if(savedDisplayMode){html.classList.remove('dark-mode','high-contrast');if(savedDisplayMode==='dark')html.classList.add('dark-mode');if(savedDisplayMode==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode'&&btn.dataset.value===savedDisplayMode)btn.classList.add('active');else if(btn.dataset.action==='displayMode')btn.classList.remove('active');});}const savedDyslexicFont=localStorage.getItem('dyslexicFont');if(savedDyslexicFont){if(savedDyslexicFont==='on'){html.classList.add('dyslexic-font');}else{html.classList.remove('dyslexic-font');}settingsButtons.forEach(function(btn){if(btn.dataset.action==='dyslexicFont'&&btn.dataset.value===savedDyslexicFont)btn.classList.add('active');else if(btn.dataset.action==='dyslexicFont')btn.classList.remove('active');});}const savedReduceMotion=localStorage.getItem('reduceMotion');if(savedReduceMotion==='enabled'&&reduceMotionCheckbox){reduceMotionCheckbox.checked=true;html.classList.add('reduce-motion');}const savedLanguage=localStorage.getItem('language');if(savedLanguage&&languageSelect){languageSelect.value=savedLanguage;updateLanguage(savedLanguage,'parents');}});
+
+// Chatbot
+(function(){
+  const fab=document.getElementById('chat-fab'),win=document.getElementById('chat-window'),cb=document.getElementById('chat-close'),inp=document.getElementById('chat-input'),send=document.getElementById('chat-send'),msgs=document.getElementById('chat-messages');
+  let history=[];
+  fab.addEventListener('click',function(){win.style.display===('flex')?win.style.display='none':(win.style.display='flex',inp.focus());});
+  cb.addEventListener('click',function(){win.style.display='none';});
+  function appendMsg(text,role){const d=document.createElement('div');d.className='chat-msg '+role;d.textContent=text;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d;}
+  async function sendMessage(){const text=inp.value.trim();if(!text)return;appendMsg(text,'user');history.push({role:'user',text});inp.value='';const t=appendMsg('Typing…','bot typing');try{const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({history})});const data=await r.json();const reply=data.reply||'Sorry, no response.';t.classList.remove('typing');t.textContent=reply;history.push({role:'bot',text:reply});}catch(err){t.classList.remove('typing');t.textContent='Connection error — is the server running?';}}
+  send.addEventListener('click',sendMessage);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')sendMessage();});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Amazon T Levels Hub</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #232f3e;
+      --secondary: #146eb4;
+      --accent: #ff9900;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --border: #dee2e6;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Login Page */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #232f3e 0%, #146eb4 100%);
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h1 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .login-box p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--secondary);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #0d5a9e;
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: var(--danger);
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      display: none;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 250px;
+      height: 100vh;
+      background: var(--primary);
+      color: white;
+      padding: 20px 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .sidebar-header p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 5px;
+    }
+
+    .nav-item {
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .nav-item.active {
+      border-left: 3px solid var(--accent);
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+    }
+
+    .header {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header h1 {
+      color: var(--primary);
+      font-size: 24px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .user-info span {
+      color: #666;
+    }
+
+    .btn-logout {
+      padding: 8px 16px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-logout:hover {
+      background: #c82333;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-left: 4px solid var(--secondary);
+    }
+
+    .stat-card h3 {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .stat-card .change {
+      font-size: 12px;
+      margin-top: 5px;
+      color: var(--success);
+    }
+
+    /* Content Sections */
+    .content-section {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      padding: 10px 20px;
+      background: var(--secondary);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .btn-primary:hover {
+      background: #0d5a9e;
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table thead {
+      background: var(--light);
+    }
+
+    table th, table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    table th {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 14px;
+    }
+
+    table tbody tr:hover {
+      background: var(--light);
+    }
+
+    .badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .badge-success {
+      background: #d4edda;
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .badge-danger {
+      background: #f8d7da;
+      color: var(--danger);
+    }
+
+    .badge-info {
+      background: #d1ecf1;
+      color: #0c5460;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-edit {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-delete {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-view {
+      background: var(--success);
+      color: white;
+    }
+
+    /* Filters */
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .filters input, .filters select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .filters input {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 20px;
+    }
+
+    .pagination button {
+      padding: 8px 16px;
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .pagination button:hover:not(:disabled) {
+      background: var(--light);
+    }
+
+    .pagination .page-info {
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .spinner {
+      border: 3px solid var(--light);
+      border-top: 3px solid var(--secondary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-header h3 {
+      color: var(--primary);
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main-content {
+        margin-left: 0;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 10px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <!-- Login Page -->
+  <div class="login-container" id="loginPage">
+    <div class="login-box">
+      <h1>🔐 Admin Dashboard</h1>
+      <p>Amazon T Levels Hub</p>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" required placeholder="admin@amazon.com">
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="Enter your password">
+        </div>
+        <button type="submit" class="btn" id="loginBtn">Login</button>
+        <div class="error-message" id="loginError"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="dashboard" id="dashboard">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h2>📊 Admin Panel</h2>
+        <p>Amazon T Levels Hub</p>
+      </div>
+      <div class="nav-item active" data-section="overview">
+        <span>📈</span>
+        <span>Overview</span>
+      </div>
+      <div class="nav-item" data-section="users">
+        <span>👥</span>
+        <span>Users</span>
+      </div>
+      <div class="nav-item" data-section="contacts">
+        <span>📧</span>
+        <span>Contacts</span>
+      </div>
+      <div class="nav-item" data-section="registrations">
+        <span>📝</span>
+        <span>Registrations</span>
+      </div>
+      <div class="nav-item" data-section="audit-logs">
+        <span>🔍</span>
+        <span>Audit Logs</span>
+      </div>
+      <div class="nav-item" data-section="analytics">
+        <span>📊</span>
+        <span>Analytics</span>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="header">
+        <h1 id="pageTitle">Dashboard Overview</h1>
+        <div class="user-info">
+          <span id="adminName">Admin</span>
+          <button class="btn-logout" onclick="logout()">Logout</button>
+        </div>
+      </div>
+
+      <!-- Overview Section -->
+      <div class="content-section active" id="overview">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Total Users</h3>
+            <div class="value" id="totalUsers">0</div>
+            <div class="change" id="recentUsers">+0 this week</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Contacts</h3>
+            <div class="value" id="totalContacts">0</div>
+            <div class="change" id="pendingContacts">0 pending</div>
+          </div>
+          <div class="stat-card">
+            <h3>Total Registrations</h3>
+            <div class="value" id="totalRegistrations">0</div>
+            <div class="change" id="recentRegistrations">+0 this week</div>
+          </div>
+          <div class="stat-card">
+            <h3>Pending Contacts</h3>
+            <div class="value" id="pendingContactsCard">0</div>
+            <div class="change">Requires attention</div>
+          </div>
+        </div>
+
+        <div class="content-section">
+          <h2 style="color: var(--primary); margin-bottom: 20px;">Recent Activity</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Action</th>
+                  <th>Details</th>
+                  <th>IP Address</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="recentActivityTable">
+                <tr>
+                  <td colspan="4" class="loading">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Section -->
+      <div class="content-section" id="users">
+        <div class="section-header">
+          <h2>User Management</h2>
+          <button class="btn-primary" onclick="exportUsers()">📥 Export CSV</button>
+        </div>
+        <div class="filters">
+          <input type="text" id="userSearch" placeholder="Search users..." onkeyup="searchUsers()">
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Name</th>
+                <th>Account Type</th>
+                <th>2FA</th>
+                <th>Created</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTable">
+              <tr>
+                <td colspan="7" class="loading">
+                  <div class="spinner"></div>
+                  Loading users...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="usersPagination"></div>
+      </div>
+
+      <!-- Contacts Section -->
+      <div class="content-section" id="contacts">
+        <div class="section-header">
+          <h2>Contact Submissions</h2>
+          <button class="btn-primary" onclick="exportContacts()">📥 Export CSV</button>
+        </div>
+        <div class="filters">
+          <select id="contactStatusFilter" onchange="filterContacts()">
+            <option value="">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="contactsTable">
+              <tr>
+                <td colspan="7" class="loading">
+                  <div class="spinner"></div>
+                  Loading contacts...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="contactsPagination"></div>
+      </div>
+
+      <!-- Registrations Section -->
+      <div class="content-section" id="registrations">
+        <div class="section-header">
+          <h2>Interest Registrations</h2>
+        </div>
+        <div class="filters">
+          <select id="audienceFilter" onchange="filterRegistrations()">
+            <option value="">All Audiences</option>
+            <option value="Student">Student</option>
+            <option value="Parent">Parent</option>
+            <option value="Teacher">Teacher</option>
+            <option value="School Representative">School Representative</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Audience</th>
+                <th>Interest</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="registrationsTable">
+              <tr>
+                <td colspan="6" class="loading">
+                  <div class="spinner"></div>
+                  Loading registrations...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="registrationsPagination"></div>
+      </div>
+
+      <!-- Audit Logs Section -->
+      <div class="content-section" id="audit-logs">
+        <div class="section-header">
+          <h2>Audit Logs</h2>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Action</th>
+                <th>Details</th>
+                <th>IP Address</th>
+                <th>Time</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogsTable">
+              <tr>
+                <td colspan="5" class="loading">
+                  <div class="spinner"></div>
+                  Loading audit logs...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="auditLogsPagination"></div>
+      </div>
+
+      <!-- Analytics Section -->
+      <div class="content-section" id="analytics">
+        <div class="section-header">
+          <h2>Analytics</h2>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Account Type Distribution</h3>
+            <div id="accountTypeStats"></div>
+          </div>
+          <div class="stat-card">
+            <h3>Audience Distribution</h3>
+            <div id="audienceStats"></div>
+          </div>
+        </div>
+        <div class="content-section">
+          <h3 style="color: var(--primary); margin-bottom: 15px;">Growth Trends (Last 30 Days)</h3>
+          <div id="growthStats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit User Modal -->
+  <div class="modal" id="editUserModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Edit User</h3>
+        <button class="close-btn" onclick="closeModal('editUserModal')">&times;</button>
+      </div>
+      <form id="editUserForm">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label for="editUserName">Full Name</label>
+          <input type="text" id="editUserName" required>
+        </div>
+        <div class="form-group">
+          <label for="editUserType">Account Type</label>
+          <select id="editUserType" required>
+            <option value="Student">Student</option>
+            <option value="Parent">Parent</option>
+            <option value="Teacher">Teacher</option>
+            <option value="School Representative">School Representative</option>
+            <option value="Admin">Admin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="editUser2FA">Enable 2FA</label>
+          <select id="editUser2FA" required>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Update Contact Modal -->
+  <div class="modal" id="updateContactModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Update Contact Status</h3>
+        <button class="close-btn" onclick="closeModal('updateContactModal')">&times;</button>
+      </div>
+      <form id="updateContactForm">
+        <input type="hidden" id="updateContactId">
+        <div class="form-group">
+          <label for="updateContactStatus">Status</label>
+          <select id="updateContactStatus" required>
+            <option value="pending">Pending</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <button type="submit" class="btn">Update Status</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentUser = null;
+    let currentPage = {
+      users: 1,
+      contacts: 1,
+      registrations: 1,
+      auditLogs: 1
+    };
+
+    // API Base URL
+    const API_BASE = 'http://localhost:3000/api/admin';
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const loginError = document.getElementById('loginError');
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Logging in...';
+      loginError.textContent = '';
+
+      try {
+        // First, login via auth endpoint
+        const authResponse = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const authData = await authResponse.json();
+
+        if (!authData.success) {
+          throw new Error(authData.message || 'Login failed');
+        }
+
+        const token = authData.token;
+
+        // Verify admin status
+        const adminResponse = await fetch(`${API_BASE}/dashboard`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        const adminData = await adminResponse.json();
+
+        if (!adminData.success) {
+          throw new Error('Admin access required');
+        }
+
+        // Store token and user info
+        currentUser = { token, email };
+        localStorage.setItem('adminToken', token);
+        localStorage.setItem('adminEmail', email);
+
+        // Show dashboard
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('adminName').textContent = email;
+
+        // Load dashboard data
+        loadDashboard();
+        loadUsers();
+        loadContacts();
+        loadRegistrations();
+        loadAuditLogs();
+        loadAnalytics();
+
+      } catch (error) {
+        loginError.textContent = error.message;
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Login';
+      }
+    });
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminEmail');
+      currentUser = null;
+      location.reload();
+    }
+
+    // Check for existing session
+    function checkSession() {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        currentUser = { token, email: localStorage.getItem('adminEmail') };
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('adminName').textContent = currentUser.email;
+        loadDashboard();
+        loadUsers();
+        loadContacts();
+        loadRegistrations();
+        loadAuditLogs();
+        loadAnalytics();
+      }
+    }
+
+    // Navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const section = item.dataset.section;
+        
+        // Update active nav
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        item.classList.add('active');
+
+        // Show section
+        document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(section).classList.add('active');
+
+        // Update title
+        const titles = {
+          overview: 'Dashboard Overview',
+          users: 'User Management',
+          contacts: 'Contact Submissions',
+          registrations: 'Interest Registrations',
+          'audit-logs': 'Audit Logs',
+          analytics: 'Analytics'
+        };
+        document.getElementById('pageTitle').textContent = titles[section] || 'Dashboard';
+      });
+    });
+
+    // Load Dashboard
+    async function loadDashboard() {
+      try {
+        const response = await fetch(`${API_BASE}/dashboard`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          document.getElementById('totalUsers').textContent = data.stats.totalUsers;
+          document.getElementById('totalContacts').textContent = data.stats.totalContacts;
+          document.getElementById('totalRegistrations').textContent = data.stats.totalRegistrations;
+          document.getElementById('pendingContactsCard').textContent = data.stats.pendingContacts;
+          document.getElementById('recentUsers').textContent = `+${data.stats.recentUsers} this week`;
+          document.getElementById('recentRegistrations').textContent = `+${data.stats.recentRegistrations} this week`;
+          document.getElementById('pendingContacts').textContent = `${data.stats.pendingContacts} pending`;
+
+          // Recent activity
+          const activityTable = document.getElementById('recentActivityTable');
+          if (data.recentActivity && data.recentActivity.length > 0) {
+            activityTable.innerHTML = data.recentActivity.map(activity => `
+              <tr>
+                <td>${activity.action}</td>
+                <td>${activity.details}</td>
+                <td>${activity.ip_address}</td>
+                <td>${new Date(activity.created_at).toLocaleString()}</td>
+              </tr>
+            `).join('');
+          } else {
+            activityTable.innerHTML = '<tr><td colspan="4" class="empty-state">No recent activity</td></tr>';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+      }
+    }
+
+    // Load Users
+    async function loadUsers(page = 1, search = '') {
+      try {
+        const url = new URL(`${API_BASE}/users`);
+        url.searchParams.append('page', page);
+        url.searchParams.append('limit', 10);
+        if (search) url.searchParams.append('search', search);
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          const usersTable = document.getElementById('usersTable');
+          if (data.users.length === 0) {
+            usersTable.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
+          } else {
+            usersTable.innerHTML = data.users.map(user => `
+              <tr>
+                <td>${user.id}</td>
+                <td>${user.email}</td>
+                <td>${user.full_name}</td>
+                <td><span class="badge badge-info">${user.account_type}</span></td>
+                <td>${user.enable_2fa ? '✓' : '✗'}</td>
+                <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                <td class="actions">
+                  <button class="btn-sm btn-edit" onclick="editUser(${user.id})">Edit</button>
+                  <button class="btn-sm btn-delete" onclick="deleteUser(${user.id})">Delete</button>
+                </td>
+              </tr>
+            `).join('');
+          }
+
+          // Pagination
+          renderPagination('usersPagination', data.pagination, 'loadUsers');
+        }
+      } catch (error) {
+        console.error('Error loading users:', error);
+      }
+    }
+
+    // Search Users
+    function searchUsers() {
+      const search = document.getElementById('userSearch').value;
+      loadUsers(1, search);
+    }
+
+    // Edit User
+    async function editUser(userId) {
+      try {
+        const response = await fetch(`${API_BASE}/users/${userId}`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          document.getElementById('editUserId').value = data.user.id;
+          document.getElementById('editUserName').value = data.user.full_name;
+          document.getElementById('editUserType').value = data.user.account_type;
+          document.getElementById('editUser2FA').value = data.user.enable_2fa ? 'true' : 'false';
+          document.getElementById('editUserModal').classList.add('active');
+        }
+      } catch (error) {
+        console.error('Error loading user:', error);
+      }
+    }
+
+    // Update User
+    document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById('editUserId').value;
+      const full_name = document.getElementById('editUserName').value;
+      const account_type = document.getElementById('editUserType').value;
+      const enable_2fa = document.getElementById('editUser2FA').value === 'true';
+
+      try {
+        const response = await fetch(`${API_BASE}/users/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${currentUser.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ full_name, account_type, enable_2fa })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          closeModal('editUserModal');
+          loadUsers(currentPage.users);
+        }
+      } catch (error) {
+        console.error('Error updating user:', error);
+      }
+    });
+
+    // Delete User
+    async function deleteUser(userId) {
+      if (!confirm('Are you sure you want to delete this user?')) return;
+
+      try {
+        const response = await fetch(`${API_BASE}/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          loadUsers(currentPage.users);
+        }
+      } catch (error) {
+        console.error('Error deleting user:', error);
+      }
+    }
+
+    // Load Contacts
+    async function loadContacts(page = 1, status = '') {
+      try {
+        const url = new URL(`${API_BASE}/contacts`);
+        url.searchParams.append('page', page);
+        url.searchParams.append('limit', 10);
+        if (status) url.searchParams.append('status', status);
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          const contactsTable = document.getElementById('contactsTable');
+          if (data.contacts.length === 0) {
+            contactsTable.innerHTML = '<tr><td colspan="7" class="empty-state">No contacts found</td></tr>';
+          } else {
+            contactsTable.innerHTML = data.contacts.map(contact => {
+              const statusClass = {
+                pending: 'badge-warning',
+                in_progress: 'badge-info',
+                resolved: 'badge-success',
+                closed: 'badge-danger'
+              }[contact.status] || 'badge-info';
+
+              return `
+                <tr>
+                  <td>${contact.id}</td>
+                  <td>${contact.name || 'N/A'}</td>
+                  <td>${contact.email}</td>
+                  <td>${contact.subject}</td>
+                  <td><span class="badge ${statusClass}">${contact.status}</span></td>
+                  <td>${new Date(contact.created_at).toLocaleDateString()}</td>
+                  <td class="actions">
+                    <button class="btn-sm btn-edit" onclick="updateContact(${contact.id}, '${contact.status}')">Update</button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+          }
+
+          renderPagination('contactsPagination', data.pagination, 'loadContacts');
+        }
+      } catch (error) {
+        console.error('Error loading contacts:', error);
+      }
+    }
+
+    // Filter Contacts
+    function filterContacts() {
+      const status = document.getElementById('contactStatusFilter').value;
+      loadContacts(1, status);
+    }
+
+    // Update Contact
+    function updateContact(contactId, currentStatus) {
+      document.getElementById('updateContactId').value = contactId;
+      document.getElementById('updateContactStatus').value = currentStatus;
+      document.getElementById('updateContactModal').classList.add('active');
+    }
+
+    // Update Contact Form Submit
+    document.getElementById('updateContactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const contactId = document.getElementById('updateContactId').value;
+      const status = document.getElementById('updateContactStatus').value;
+
+      try {
+        const response = await fetch(`${API_BASE}/contacts/${contactId}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${currentUser.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ status })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          closeModal('updateContactModal');
+          loadContacts(currentPage.contacts);
+          loadDashboard();
+        }
+      } catch (error) {
+        console.error('Error updating contact:', error);
+      }
+    });
+
+    // Load Registrations
+    async function loadRegistrations(page = 1, audience = '') {
+      try {
+        const url = new URL(`${API_BASE}/registrations`);
+        url.searchParams.append('page', page);
+        url.searchParams.append('limit', 10);
+        if (audience) url.searchParams.append('audience', audience);
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          const registrationsTable = document.getElementById('registrationsTable');
+          if (data.registrations.length === 0) {
+            registrationsTable.innerHTML = '<tr><td colspan="6" class="empty-state">No registrations found</td></tr>';
+          } else {
+            registrationsTable.innerHTML = data.registrations.map(reg => `
+              <tr>
+                <td>${reg.id}</td>
+                <td>${reg.full_name}</td>
+                <td>${reg.email}</td>
+                <td><span class="badge badge-info">${reg.audience}</span></td>
+                <td>${reg.interest || 'N/A'}</td>
+                <td>${new Date(reg.created_at).toLocaleDateString()}</td>
+              </tr>
+            `).join('');
+          }
+
+          renderPagination('registrationsPagination', data.pagination, 'loadRegistrations');
+        }
+      } catch (error) {
+        console.error('Error loading registrations:', error);
+      }
+    }
+
+    // Filter Registrations
+    function filterRegistrations() {
+      const audience = document.getElementById('audienceFilter').value;
+      loadRegistrations(1, audience);
+    }
+
+    // Load Audit Logs
+    async function loadAuditLogs(page = 1) {
+      try {
+        const url = new URL(`${API_BASE}/audit-logs`);
+        url.searchParams.append('page', page);
+        url.searchParams.append('limit', 10);
+
+        const response = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          const auditLogsTable = document.getElementById('auditLogsTable');
+          if (data.logs.length === 0) {
+            auditLogsTable.innerHTML = '<tr><td colspan="5" class="empty-state">No audit logs found</td></tr>';
+          } else {
+            auditLogsTable.innerHTML = data.logs.map(log => `
+              <tr>
+                <td>${log.id}</td>
+                <td>${log.action}</td>
+                <td>${log.details}</td>
+                <td>${log.ip_address}</td>
+                <td>${new Date(log.created_at).toLocaleString()}</td>
+              </tr>
+            `).join('');
+          }
+
+          renderPagination('auditLogsPagination', data.pagination, 'loadAuditLogs');
+        }
+      } catch (error) {
+        console.error('Error loading audit logs:', error);
+      }
+    }
+
+    // Load Analytics
+    async function loadAnalytics() {
+      try {
+        const response = await fetch(`${API_BASE}/analytics`, {
+          headers: { 'Authorization': `Bearer ${currentUser.token}` }
+        });
+        const data = await response.json();
+
+        if (data.success) {
+          // Account type distribution
+          const accountTypeStats = document.getElementById('accountTypeStats');
+          if (data.accountTypeDistribution && data.accountTypeDistribution.length > 0) {
+            accountTypeStats.innerHTML = data.accountTypeDistribution.map(item => `
+              <div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                <strong>${item.account_type}:</strong> ${item.count}
+              </div>
+            `).join('');
+          }
+
+          // Audience distribution
+          const audienceStats = document.getElementById('audienceStats');
+          if (data.audienceDistribution && data.audienceDistribution.length > 0) {
+            audienceStats.innerHTML = data.audienceDistribution.map(item => `
+              <div style="padding: 8px 0; border-bottom: 1px solid #eee;">
+                <strong>${item.audience}:</strong> ${item.count}
+              </div>
+            `).join('');
+          }
+
+          // Growth stats
+          const growthStats = document.getElementById('growthStats');
+          if (data.userGrowth && data.userGrowth.length > 0) {
+            growthStats.innerHTML = `
+              <p><strong>User Growth:</strong> ${data.userGrowth.length} active days in last 30 days</p>
+              <p><strong>Registration Growth:</strong> ${data.registrationGrowth.length} active days</p>
+              <p><strong>Contact Growth:</strong> ${data.contactGrowth.length} active days</p>
+            `;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading analytics:', error);
+      }
+    }
+
+    // Render Pagination
+    function renderPagination(elementId, pagination, loadFunction) {
+      const element = document.getElementById(elementId);
+      if (!pagination || pagination.totalPages <= 1) {
+        element.innerHTML = '';
+        return;
+      }
+
+      let html = `
+        <button ${pagination.page === 1 ? 'disabled' : ''} 
+                onclick="${loadFunction}(${pagination.page - 1})">Previous</button>
+        <span class="page-info">Page ${pagination.page} of ${pagination.totalPages}</span>
+        <button ${pagination.page === pagination.totalPages ? 'disabled' : ''} 
+                onclick="${loadFunction}(${pagination.page + 1})">Next</button>
+      `;
+
+      element.innerHTML = html;
+    }
+
+    // Modal functions
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Export functions
+    async function exportUsers() {
+      window.open(`${API_BASE}/export/users`, '_blank');
+    }
+
+    async function exportContacts() {
+      window.open(`${API_BASE}/export/contacts`, '_blank');
+    }
+
+    // Initialize
+    checkSession();
+  </script>
+</body>
+</html>

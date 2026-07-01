@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — Amazon T Levels Hub</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#F2F4F7;color:#1E2B3C;min-height:100vh;display:flex;flex-direction:column;}
+.navbar{background:#1E2B3C;padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 20px rgba(0,0,0,0.25);}
+.logo{color:white;font-size:20px;font-weight:700;}.logo span{color:#FF9900;}
+.nav-tools{display:flex;gap:10px;}
+.small-btn{background:none;color:#D2D7DF;padding:8px 12px;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+.small-btn:hover{color:white;background:rgba(255,255,255,0.08);}
+.icon-sun,.icon-moon{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;}
+.icon-moon{display:block;}.icon-sun{display:none;}
+.dark-mode .icon-moon{display:none;}
+.auth-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.auth-box{background:white;width:100%;max-width:460px;border-radius:20px;box-shadow:0 8px 48px rgba(30,43,60,0.12);overflow:hidden;}
+.auth-box-top{background:#E8ECF2;padding:36px 40px;position:relative;}
+.auth-box-top::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#FF9900,#2E9E8E);}
+.auth-box-top h2{color:#1E2B3C;font-size:24px;font-weight:800;margin-bottom:4px;}
+.auth-box-top p{color:#4A5568;font-size:14px;}
+.auth-body{padding:36px 40px;}
+.auth-tabs{display:none;}.auth-tabs.active{display:block;}
+.switch-link{font-size:13px;color:#4A5568;margin-bottom:24px;}
+.switch-link a{color:#FF9900;cursor:pointer;font-weight:600;text-decoration:none;}
+.switch-link a:hover{text-decoration:underline;}
+.form-group{margin-bottom:18px;}
+.form-group label{display:block;font-size:13px;font-weight:600;color:#4A5568;margin-bottom:6px;letter-spacing:0.2px;}
+.form-group input,.form-group select{width:100%;padding:11px 14px;border:1.5px solid #D2D7DF;border-radius:10px;font-size:14px;background:white;color:#1E2B3C;outline:none;transition:border-color 0.2s;}
+.form-group input:focus,.form-group select:focus{border-color:#2E9E8E;}
+.form-group input[type=checkbox]{width:auto;margin-right:8px;}
+.password-wrapper{position:relative;}
+.password-wrapper input{padding-right:45px;}
+.password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#4A5568;padding:4px;display:flex;align-items:center;justify-content:center;transition:color 0.2s;}
+.password-toggle:hover{color:#2E9E8E;}
+.password-toggle svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+.btn-submit{width:100%;padding:13px;background:#FF9900;color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all 0.2s;margin-top:8px;}
+.btn-submit:hover{background:#e68a00;transform:translateY(-1px);}
+.btn-submit:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+.divider{display:flex;align-items:center;margin:20px 0;color:#D2D7DF;font-size:12px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:#E8ECF2;}
+.divider span{margin:0 14px;}
+.msg{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:14px;font-weight:600;display:none;}
+.msg.success{background:#d4edda;color:#155724;display:block;}
+.msg.error{background:#f8d7da;color:#721c24;display:block;}
+.msg.info{background:#d1ecf1;color:#0c5460;display:block;}
+.code-inputs{display:flex;gap:10px;justify-content:center;margin-bottom:16px;}
+.code-input{width:46px;height:52px;font-size:22px;text-align:center;border:1.5px solid #D2D7DF;border-radius:10px;background:white;color:#1E2B3C;font-weight:700;outline:none;}
+.code-input:focus{border-color:#FF9900;}
+.forgot-password{display:block;text-align:right;font-size:12px;color:#FF9900;cursor:pointer;text-decoration:none;margin-top:4px;}
+.forgot-password:hover{text-decoration:underline;}
+footer{background:#1E2B3C;color:#D2D7DF;text-align:center;padding:20px;font-size:13px;}
+footer strong{color:#FF9900;}
+/* Dark mode */
+@media(max-width:500px){.auth-box-top,.auth-body{padding:28px 24px;}}
+
+/* ── MODAL ─────────────────────────────────────────────────────────── */
+.modal{display:none;position:fixed;z-index:2000;inset:0;background:rgba(30,43,60,0.6);backdrop-filter:blur(8px);justify-content:center;align-items:center;}
+.modal-content{background:#E8ECF2;width:90%;max-width:560px;padding:40px;border-radius:16px;border-top:4px solid #FF9900;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:popup 0.3s ease;color:#1E2B3C;}
+.modal-content h2{color:#1E2B3C;margin-bottom:6px;font-size:22px;font-weight:700;}
+.modal-subtitle{color:#4A5568;font-size:14px;margin-bottom:24px;}
+.close-btn{float:right;font-size:24px;cursor:pointer;color:#4A5568;line-height:1;transition:color 0.2s;}
+.close-btn:hover{color:#FF9900;}
+@keyframes popup{from{transform:scale(0.9) translateY(10px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+
+/* ── DYSLEXIC FONT ─────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+.dyslexic-font, .dyslexic-font * {
+  font-family: 'OpenDyslexic', 'Segoe UI', Arial, sans-serif !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.1em !important;
+}
+
+/* ── SETTINGS BUTTONS ────────────────────────────────────────────────── */
+.settings-btn{padding:10px 20px;background:white;color:#1E2B3C;border:1.5px solid #D2D7DF;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;min-width: 60px;}
+.settings-btn:hover{border-color:#2E9E8E;color:#2E9E8E;}
+.settings-btn.active{background:#2E9E8E;color:white;border-color:#2E9E8E;}
+.settings-btn[data-action="textSize"]:nth-child(1){font-size: 12px;}
+.settings-btn[data-action="textSize"]:nth-child(2){font-size: 16px;}
+.settings-btn[data-action="textSize"]:nth-child(3){font-size: 20px;}
+
+/* ── PASSWORD STRENGTH METER ──────────────────────────────────────────── */
+.password-strength{height:4px;border-radius:2px;margin-top:6px;transition:all 0.3s;background:#e0e0e0;overflow:hidden;}
+.password-strength-bar{height:100%;width:0%;border-radius:2px;transition:width 0.3s,background 0.3s;}
+.password-strength-label{font-size:11px;margin-top:3px;display:block;text-align:right;}
+
+/* ── LOADING SPINNER ──────────────────────────────────────────────────── */
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.6s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── SKIP NAVIGATION ──────────────────────────────────────────────────── */
+.skip-link{position:absolute;top:-40px;left:0;background:#FF9900;color:#1E2B3C;padding:8px 16px;z-index:9999;font-weight:600;font-size:14px;transition:top 0.2s;}
+.skip-link:focus{top:0;}
+
+/* ── HIGH CONTRAST MODE ────────────────────────────────────────────── */
+.high-contrast{background:#000000 !important;color:#FFFFFF !important;}
+.high-contrast .navbar{background:#000000 !important;border-bottom: 2px solid #FFFF00 !important;}
+.high-contrast .auth-box{background:#000000 !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .auth-box-top{background:#000000 !important;}
+.high-contrast .auth-box-top h2{color:#FFFF00 !important;}
+.high-contrast .auth-box-top p{color:#FFFFFF !important;}
+.high-contrast .auth-body{background:#000000 !important;}
+.high-contrast .switch-link{color:#FFFFFF !important;}
+.high-contrast .form-group label{color:#FFFF00 !important;}
+.high-contrast .form-group input,.high-contrast .form-group select{background:#000000 !important;color:#FFFFFF !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .btn-submit{background:#FFFF00 !important;color:#000000 !important;}
+.high-contrast .btn-submit:disabled{background:#666 !important;color:#999 !important;}
+.high-contrast .divider::before,.high-contrast .divider::after{background:#FFFF00 !important;}
+.high-contrast .divider span{color:#FFFFFF !important;}
+.high-contrast footer{background:#000000 !important;border-top: 2px solid #FFFF00 !important;}
+.high-contrast .modal-content{background:#000000 !important;border: 2px solid #FFFF00 !important;color:#FFFFFF !important;}
+.high-contrast .modal-content h2{color:#FFFF00 !important;}
+.high-contrast .close-btn{color:#FFFFFF !important;}
+.high-contrast .close-btn:hover{color:#FFFF00 !important;}
+.high-contrast .settings-btn{background:#000000 !important;color:#FFFFFF !important;border: 2px solid #FFFF00 !important;}
+.high-contrast .settings-btn.active{background:#FFFF00 !important;color:#000000 !important;border-color:#FFFF00 !important;}
+.high-contrast .settings-btn:hover{border-color:#FFFF00 !important;color:#FFFF00 !important;}
+.high-contrast .forgot-password{color:#FFFF00 !important;}
+.high-contrast .password-strength{background:#333 !important;}
+
+/* ╔══════════════════════════════════════════════════════════════════╗
+   ║  DARK MODE                                                       ║
+   ╚══════════════════════════════════════════════════════════════════╝ */
+
+/* Base */
+.dark-mode,
+html.dark-mode body{background:#0F172A!important;color:#F8FAFC!important;}
+
+/* Navbar */
+.dark-mode .navbar{background:#162033!important;box-shadow:0 2px 20px rgba(0,0,0,0.5)!important;border-bottom:1px solid #334155!important;}
+.dark-mode .logo{color:#F8FAFC!important;}
+.dark-mode .logo span{color:#FF9900!important;}
+.dark-mode .nav-links a{color:#CBD5E1!important;}
+.dark-mode .nav-links a:hover{color:#F8FAFC!important;background:rgba(255,255,255,0.07)!important;}
+.dark-mode .nav-links a.active{color:#FF9900!important;}
+.dark-mode .small-btn{color:#CBD5E1!important;}
+.dark-mode .small-btn:hover{color:#FFB84D!important;background:rgba(255,255,255,0.07)!important;}
+
+/* Hero */
+.dark-mode .page-hero{background:#1B263B!important;box-shadow:0 8px 40px rgba(0,0,0,0.5)!important;}
+.dark-mode .page-hero h1{color:#F8FAFC!important;}
+.dark-mode .page-hero p{color:#CBD5E1!important;}
+
+/* Section labels */
+.dark-mode .section-label{color:#FF9900!important;}
+.dark-mode .section-title{color:#F8FAFC!important;}
+.dark-mode .section-subtitle{color:#CBD5E1!important;}
+
+/* Info boxes / general cards */
+.dark-mode .info-box{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .info-box h2{color:#FF9900!important;}
+.dark-mode .info-box p{color:#CBD5E1!important;}
+.dark-mode .info-box ul{color:#CBD5E1!important;}
+.dark-mode .info-box .tag{background:rgba(255,153,0,0.15)!important;color:#FF9900!important;border-color:rgba(255,153,0,0.3)!important;}
+
+/* Accent banner */
+.dark-mode .accent-banner{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .accent-banner h2{color:#F8FAFC!important;}
+.dark-mode .accent-banner>p{color:#CBD5E1!important;}
+.dark-mode .step-card{background:rgba(255,255,255,0.04)!important;border-color:#334155!important;}
+.dark-mode .step-card p{color:#CBD5E1!important;}
+
+/* Card section */
+.dark-mode .card-section{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .card-section-header h2{color:#F8FAFC!important;}
+.dark-mode .card-section-header p{color:#CBD5E1!important;}
+.dark-mode .feature-card{background:#0F172A!important;border-left-color:#2E9E8E!important;}
+.dark-mode .feature-card h3{color:#2E9E8E!important;}
+.dark-mode .feature-card p{color:#CBD5E1!important;}
+
+/* FAQ */
+.dark-mode .faq-item{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .faq-question{color:#F8FAFC!important;}
+.dark-mode .faq-question:hover{background:rgba(255,255,255,0.04)!important;}
+.dark-mode .faq-answer{color:#CBD5E1!important;}
+
+/* Table */
+.dark-mode table{background:#1E293B!important;box-shadow:0 4px 20px rgba(0,0,0,0.4)!important;}
+.dark-mode tbody tr{border-bottom-color:#334155!important;}
+.dark-mode tbody td{color:#CBD5E1!important;}
+.dark-mode tbody td:first-child{color:#F8FAFC!important;}
+.dark-mode tbody tr:hover{background:rgba(46,158,142,0.1)!important;}
+
+/* CTA strip */
+.dark-mode .cta-strip{background:linear-gradient(135deg,#FF9900 0%,#e68a00 100%)!important;}
+.dark-mode .cta-strip h2{color:#0F172A!important;}
+.dark-mode .cta-strip p{color:#0F172A!important;opacity:0.9!important;}
+.dark-mode .cta-btn.primary{background:#0F172A!important;color:#FF9900!important;}
+.dark-mode .cta-btn.primary:hover{background:#162033!important;}
+.dark-mode .cta-btn.outline{color:#0F172A!important;border-color:rgba(15,23,42,0.5)!important;}
+.dark-mode .cta-btn.outline:hover{background:rgba(15,23,42,0.15)!important;}
+
+/* Footer */
+.dark-mode footer{background:#162033!important;color:#CBD5E1!important;border-top-color:#334155!important;}
+.dark-mode footer strong{color:#FF9900!important;}
+
+/* Contact / generic modal */
+.dark-mode .modal-content{background:#1E293B!important;color:#F8FAFC!important;border-top-color:#FF9900!important;}
+.dark-mode .modal-content h2{color:#F8FAFC!important;}
+.dark-mode .modal-content h3{color:#F8FAFC!important;}
+.dark-mode .modal-subtitle{color:#CBD5E1!important;}
+.dark-mode .close-btn{color:#CBD5E1!important;}
+.dark-mode .close-btn:hover{color:#FFB84D!important;}
+.dark-mode .modal-content input,
+.dark-mode .modal-content select,
+.dark-mode .modal-content textarea{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .modal-content input:focus,
+.dark-mode .modal-content select:focus,
+.dark-mode .modal-content textarea:focus{border-color:#2E9E8E!important;}
+.dark-mode .modal-content input::placeholder,
+.dark-mode .modal-content textarea::placeholder{color:#64748B!important;}
+.dark-mode .modal-content option{background:#1E293B!important;color:#F8FAFC!important;}
+
+/* Settings modal interior */
+.dark-mode #languageSelect{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode label span,
+.dark-mode #reduceMotion+span{color:#F8FAFC!important;}
+.dark-mode .settings-btn{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .settings-btn:hover{border-color:#FFB84D!important;color:#FFB84D!important;}
+.dark-mode .settings-btn.active{background:#2E9E8E!important;color:white!important;border-color:#2E9E8E!important;}
+
+/* Chatbot */
+.dark-mode #chat-fab{background:#162033!important;border-color:#FF9900!important;}
+.dark-mode #chat-fab:hover{background:#FF9900!important;}
+.dark-mode #chat-window{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode #chat-header{background:#162033!important;}
+.dark-mode #chat-messages{background:#1E293B!important;}
+.dark-mode .chat-msg.bot{background:#162033!important;color:#F8FAFC!important;}
+.dark-mode .chat-msg.typing{background:#162033!important;color:#CBD5E1!important;}
+.dark-mode #chat-input-row{background:#1E293B!important;border-top-color:#334155!important;}
+.dark-mode #chat-input{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode #chat-input::placeholder{color:#64748B!important;}
+
+
+/* Index — auth box */
+.dark-mode .auth-wrap{background:#0F172A!important;}
+.dark-mode .auth-box{background:#1E293B!important;box-shadow:0 8px 48px rgba(0,0,0,0.5)!important;border-color:#334155!important;}
+.dark-mode .auth-box-top{background:#162033!important;border-bottom-color:#334155!important;}
+.dark-mode .auth-box-top h2{color:#F8FAFC!important;}
+.dark-mode .auth-box-top p{color:#CBD5E1!important;}
+.dark-mode .auth-body{background:#1E293B!important;}
+.dark-mode .auth-tabs{background:#1E293B!important;border-color:#334155!important;}
+.dark-mode .auth-tabs button{color:#CBD5E1!important;background:transparent!important;}
+.dark-mode .auth-tabs button.active{background:#FF9900!important;color:white!important;}
+.dark-mode .switch-link{color:#CBD5E1!important;}
+.dark-mode .switch-link a{color:#FF9900!important;}
+.dark-mode .switch-link a:hover{color:#FFB84D!important;}
+.dark-mode .form-group label{color:#CBD5E1!important;}
+.dark-mode .form-group input,
+.dark-mode .form-group select{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .form-group input:focus,
+.dark-mode .form-group select:focus{border-color:#2E9E8E!important;}
+.dark-mode .form-group input::placeholder{color:#64748B!important;}
+.dark-mode .form-group option{background:#1E293B!important;color:#F8FAFC!important;}
+.dark-mode .divider{color:#64748B!important;}
+.dark-mode .divider::before,
+.dark-mode .divider::after{background:#334155!important;}
+.dark-mode .code-input{background:#0F172A!important;color:#F8FAFC!important;border-color:#334155!important;}
+.dark-mode .code-input:focus{border-color:#FF9900!important;}
+.dark-mode .msg.success{background:#0d3321!important;color:#6ee7a0!important;}
+.dark-mode .msg.error{background:#3b0d0d!important;color:#fca5a5!important;}
+.dark-mode .msg.info{background:#0c2a3b!important;color:#7dd3fc!important;}
+.dark-mode .forgot-password{color:#FFB84D!important;}
+.dark-mode .password-strength{background:#334155!important;}
+
+/* ── REDUCED MOTION ────────────────────────────────────────────────── */
+.reduce-motion *{transition: none !important; animation: none !important;}
+.reduce-motion .modal-content{animation: none !important;}
+
+/* ── TEXT SIZE VARIANTS ────────────────────────────────────────────── */
+.text-small{font-size: 14px;}
+.text-small .auth-box-top h2{font-size: 22px;}
+.text-small .form-group input,.text-small .form-group select{font-size: 13px;}
+
+.text-large{font-size: 18px;}
+.text-large .auth-box-top h2{font-size: 28px;}
+.text-large .form-group input,.text-large .form-group select{font-size: 16px;}
+.text-large .btn-submit{font-size: 16px;}
+
+/* ── PRINT STYLES ──────────────────────────────────────────────────── */
+@media print{body{background:white;color:black;}.navbar,.nav-tools,#settingsBtn,#chat-fab,#chat-window,.modal{display:none!important;}.auth-box{box-shadow:none!important;border:1px solid #ddd!important;}.auth-box-top{background:#f5f5f5!important;}.btn-submit{display:none!important;}}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<nav class="navbar" role="navigation" aria-label="Main navigation">
+  <div class="logo">Amazon <span>T Levels</span></div>
+  <div class="nav-tools">
+    <button id="settingsBtn" class="small-btn" aria-label="Settings"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </div>
+</nav>
+ 
+<div class="auth-wrap" id="main-content">
+  <div class="auth-box">
+    <div class="auth-box-top">
+      <h2 id="authTitle">Welcome back</h2>
+      <p id="authSubtitle">Sign in to access the T Levels Hub</p>
+    </div>
+    <div class="auth-body">
+      <div id="message" class="msg" role="alert" aria-live="polite"></div>
+ 
+      <div id="loginTab" class="auth-tabs active">
+        <p class="switch-link">No account? <a onclick="switchTab('signup')">Create one</a></p>
+        <form id="loginForm" novalidate>
+          <div class="form-group"><label for="loginEmail">Email</label><input type="email" id="loginEmail" placeholder="you@example.com" required autocomplete="email"></div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
+              <button type="button" class="password-toggle" aria-label="Show password" data-target="loginPassword"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+            <a class="forgot-password" onclick="showForgotPassword()">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-submit" id="loginBtn">Sign In</button>
+        </form>
+        <div id="twoFALogin" style="display:none;margin-top:24px;">
+          <p style="text-align:center;font-size:14px;color:#4A5568;margin-bottom:16px;">Enter the 6-digit code sent to your email</p>
+          <div class="code-inputs" id="twoFACode">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 1">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 2">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 3">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 4">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 5">
+            <input type="text" class="code-input" maxlength="1" inputmode="numeric" aria-label="Digit 6">
+          </div>
+          <button type="button" class="btn-submit" onclick="verifyTwoFA()">Verify Code</button>
+        </div>
+        <div class="divider"><span>or</span></div>
+        <div style="display:flex;justify-content:center;"><div id="googleLoginBtn"></div></div>
+      </div>
+ 
+      <div id="signupTab" class="auth-tabs">
+        <p class="switch-link">Already have an account? <a onclick="switchTab('login')">Sign in</a></p>
+        <form id="signupForm" novalidate>
+          <div class="form-group"><label for="signupName">Full Name</label><input type="text" id="signupName" placeholder="Your full name" required autocomplete="name"></div>
+          <div class="form-group"><label for="signupEmail">Email</label><input type="email" id="signupEmail" placeholder="you@example.com" required autocomplete="email"></div>
+          <div class="form-group"><label for="accountType">Role</label><select id="accountType" required><option value="">Select your role...</option><option>Student</option><option>Parent</option><option>Teacher</option><option>School Representative</option></select></div>
+          <div class="form-group">
+            <label for="signupPassword">Password</label>
+            <div class="password-wrapper">
+              <input type="password" id="signupPassword" placeholder="Minimum 8 characters" required minlength="8" autocomplete="new-password">
+              <button type="button" class="password-toggle" aria-label="Show password" data-target="signupPassword"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            </div>
+            <div class="password-strength"><div class="password-strength-bar" id="signupStrengthBar"></div></div>
+            <span class="password-strength-label" id="signupStrengthLabel"></span>
+          </div>
+          <div class="form-group"><label for="signupPasswordConfirm">Confirm Password</label><div class="password-wrapper"><input type="password" id="signupPasswordConfirm" placeholder="Re-enter password" required autocomplete="new-password"><button type="button" class="password-toggle" aria-label="Show password" data-target="signupPasswordConfirm"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+          <div class="form-group" style="display:flex;align-items:flex-start;gap:8px;"><input type="checkbox" id="enable2FA" style="width:18px;height:18px;margin-top:3px;flex-shrink:0;"><label for="enable2FA" style="font-size:13px;font-weight:500;color:#4A5568;cursor:pointer;">Enable Two-Factor Authentication (recommended)</label></div>
+          <button type="submit" class="btn-submit" id="signupBtn">Create Account</button>
+        </form>
+        <div class="divider"><span>or</span></div>
+        <div style="display:flex;justify-content:center;"><div id="googleSignupBtn"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+  <div class="modal-content" style="max-width: 600px;">
+    <span class="close-btn" id="settingsCloseBtn" aria-label="Close settings">&times;</span>
+    <h2 id="settingsModalTitle">Accessibility Settings</h2>
+    <p class="modal-subtitle">Customize your experience</p>
+    
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;">Text Size</h3>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <button class="settings-btn" data-action="textSize" data-value="small">A</button>
+        <button class="settings-btn active" data-action="textSize" data-value="medium">A</button>
+        <button class="settings-btn" data-action="textSize" data-value="large">A</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;">Display Mode</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="displayMode" data-value="normal">Normal</button>
+        <button class="settings-btn" data-action="displayMode" data-value="dark">Dark Mode</button>
+        <button class="settings-btn" data-action="displayMode" data-value="highContrast">High Contrast</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;">Dyslexic Friendly Font</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="settings-btn active" data-action="dyslexicFont" data-value="off">Off</button>
+        <button class="settings-btn" data-action="dyslexicFont" data-value="on">On</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 24px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;">Language</h3>
+      <select id="languageSelect" style="width: 100%; padding: 10px 14px; border: 1.5px solid #D2D7DF; border-radius: 8px; font-size: 14px; background: white; color: #1E2B3C;">
+        <option value="en">English</option>
+        <option value="fr">Français (French)</option>
+        <option value="zh">中文 (Chinese)</option>
+        <option value="de">Deutsch (German)</option>
+      </select>
+    </div>
+
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px; color: #1E2B3C;">Motion</h3>
+      <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+        <input type="checkbox" id="reduceMotion" style="width: 18px; height: 18px; cursor: pointer;">
+        <span style="font-size: 14px; color: #1E2B3C;">Reduce motion (disable animations)</span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div id="forgotPasswordModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="forgotModalTitle">
+  <div class="modal-content" style="max-width: 420px;">
+    <span class="close-btn" id="forgotCloseBtn" aria-label="Close">&times;</span>
+    <h2 id="forgotModalTitle">Reset Password</h2>
+    <p class="modal-subtitle">Enter your email and we'll send you a reset link</p>
+    <form id="forgotPasswordForm" novalidate>
+      <div class="form-group"><label for="resetEmail">Email</label><input type="email" id="resetEmail" placeholder="you@example.com" required></div>
+      <button type="submit" class="btn-submit" id="resetBtn">Send Reset Link</button>
+    </form>
+    <div id="forgotMessage" class="msg" role="alert" aria-live="polite"></div>
+  </div>
+</div>
+
+<footer>&copy; 2026 <strong>Amazon T Levels Hub</strong> — Supporting Future Careers</footer>
+ 
+<script>
+// Use relative URL instead of hardcoded localhost
+const API_BASE = (function(){
+  // In production, use relative path; in development, detect port
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:3000';
+  }
+  return '';
+})();
+
+const html=document.documentElement;
+
+window.addEventListener('load',function(){
+  if(localStorage.getItem('authToken')) window.location.href='Main.html';
+});
+
+// ── PASSWORD STRENGTH METER ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  const pwInput = document.getElementById('signupPassword');
+  const strengthBar = document.getElementById('signupStrengthBar');
+  const strengthLabel = document.getElementById('signupStrengthLabel');
+  
+  if (pwInput && strengthBar) {
+    pwInput.addEventListener('input', function() {
+      const val = this.value;
+      let strength = 0;
+      let label = '';
+      let color = '#e0e0e0';
+      
+      if (val.length >= 8) strength += 25;
+      if (val.length >= 12) strength += 15;
+      if (/[A-Z]/.test(val)) strength += 15;
+      if (/[a-z]/.test(val)) strength += 15;
+      if (/[0-9]/.test(val)) strength += 15;
+      if (/[^A-Za-z0-9]/.test(val)) strength += 15;
+      
+      if (val.length === 0) { strength = 0; label = ''; color = '#e0e0e0'; }
+      else if (strength < 30) { label = 'Weak'; color = '#ef4444'; }
+      else if (strength < 50) { label = 'Fair'; color = '#f97316'; }
+      else if (strength < 70) { label = 'Good'; color = '#eab308'; }
+      else if (strength < 85) { label = 'Strong'; color = '#22c55e'; }
+      else { label = 'Very Strong'; color = '#16a34a'; }
+      
+      strengthBar.style.width = Math.min(strength, 100) + '%';
+      strengthBar.style.background = color;
+      if (strengthLabel) strengthLabel.textContent = label;
+    });
+  }
+});
+
+// Settings Modal
+const settingsModal=document.getElementById('settingsModal');
+const settingsBtn=document.getElementById('settingsBtn');
+if(settingsBtn){settingsBtn.addEventListener('click',function(e){e.preventDefault();settingsModal.style.display='flex';});}
+if(settingsModal){document.getElementById('settingsCloseBtn').addEventListener('click',function(){settingsModal.style.display='none';});window.addEventListener('click',function(e){if(e.target===settingsModal)settingsModal.style.display='none';});}
+const settingsButtons=document.querySelectorAll('.settings-btn');
+const languageSelect=document.getElementById('languageSelect');
+const reduceMotionCheckbox=document.getElementById('reduceMotion');
+settingsButtons.forEach(function(button){button.addEventListener('click',function(){const action=this.dataset.action;const value=this.dataset.value;if(action==='textSize'){html.classList.remove('text-small','text-large');if(value==='small')html.classList.add('text-small');if(value==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('textSize',value);}if(action==='displayMode'){html.classList.remove('dark-mode','high-contrast');if(value==='dark')html.classList.add('dark-mode');if(value==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('displayMode',value);}if(action==='dyslexicFont'){if(value==='on'){html.classList.add('dyslexic-font');}else{html.classList.remove('dyslexic-font');}settingsButtons.forEach(function(btn){if(btn.dataset.action==='dyslexicFont')btn.classList.remove('active');});this.classList.add('active');localStorage.setItem('dyslexicFont',value);}});});
+if(languageSelect){languageSelect.addEventListener('change',function(){localStorage.setItem('language',this.value);updateLanguage(this.value,'main');});}
+if(reduceMotionCheckbox){reduceMotionCheckbox.addEventListener('change',function(){if(this.checked){html.classList.add('reduce-motion');localStorage.setItem('reduceMotion','enabled');}else{html.classList.remove('reduce-motion');localStorage.setItem('reduceMotion','disabled');}});}
+window.addEventListener('load',function(){const savedTextSize=localStorage.getItem('textSize');if(savedTextSize){html.classList.remove('text-small','text-large');if(savedTextSize==='small')html.classList.add('text-small');if(savedTextSize==='large')html.classList.add('text-large');settingsButtons.forEach(function(btn){if(btn.dataset.action==='textSize'&&btn.dataset.value===savedTextSize)btn.classList.add('active');else if(btn.dataset.action==='textSize')btn.classList.remove('active');});}const savedDisplayMode=localStorage.getItem('displayMode');if(savedDisplayMode){html.classList.remove('dark-mode','high-contrast');if(savedDisplayMode==='dark')html.classList.add('dark-mode');if(savedDisplayMode==='highContrast')html.classList.add('high-contrast');settingsButtons.forEach(function(btn){if(btn.dataset.action==='displayMode'&&btn.dataset.value===savedDisplayMode)btn.classList.add('active');else if(btn.dataset.action==='displayMode')btn.classList.remove('active');});}const savedDyslexicFont=localStorage.getItem('dyslexicFont');if(savedDyslexicFont){if(savedDyslexicFont==='on'){html.classList.add('dyslexic-font');}else{html.classList.remove('dyslexic-font');}settingsButtons.forEach(function(btn){if(btn.dataset.action==='dyslexicFont'&&btn.dataset.value===savedDyslexicFont)btn.classList.add('active');else if(btn.dataset.action==='dyslexicFont')btn.classList.remove('active');});}const savedReduceMotion=localStorage.getItem('reduceMotion');if(savedReduceMotion==='enabled'&&reduceMotionCheckbox){reduceMotionCheckbox.checked=true;html.classList.add('reduce-motion');}const savedLanguage=localStorage.getItem('language');if(savedLanguage&&languageSelect){languageSelect.value=savedLanguage;}});
+function switchTab(tab){
+  document.getElementById('loginTab').classList.remove('active');
+  document.getElementById('signupTab').classList.remove('active');
+  document.getElementById(tab+'Tab').classList.add('active');
+  document.getElementById('authTitle').textContent=tab==='login'?'Welcome back':'Create an account';
+  document.getElementById('authSubtitle').textContent=tab==='login'?'Sign in to access the T Levels Hub':'Join the T Levels Hub';
+  clearMessage();
+}
+function showMessage(text,type){const m=document.getElementById('message');m.textContent=text;m.className='msg '+type;setTimeout(()=>clearMessage(),5000);}
+function clearMessage(){const m=document.getElementById('message');m.className='msg';m.textContent='';}
+
+// Login form with loading state
+document.getElementById('loginForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('loginBtn');
+  const email=document.getElementById('loginEmail').value,password=document.getElementById('loginPassword').value;
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Signing In...';
+  try{const r=await fetch(API_BASE+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});const data=await r.json();
+  if(r.ok){if(data.requiresTwoFA){document.getElementById('loginForm').style.display='none';document.getElementById('twoFALogin').style.display='block';localStorage.setItem('tempLoginToken',data.tempToken);showMessage('Check your email for the 2FA code','info');}else{localStorage.setItem('authToken',data.token);showMessage('Signed in! Redirecting...','success');setTimeout(()=>window.location.href='Main.html',1200);}}
+  else showMessage(data.message||'Login failed','error');}catch(err){showMessage('Error connecting to server','error');}
+  finally{btn.disabled=false; btn.textContent='Sign In';}
+});
+const codeInputs=document.querySelectorAll('.code-input');
+codeInputs.forEach((input,i)=>{input.addEventListener('input',function(){if(this.value.length===1&&i<codeInputs.length-1)codeInputs[i+1].focus();});input.addEventListener('keydown',function(e){if(e.key==='Backspace'&&this.value.length===0&&i>0)codeInputs[i-1].focus();});});
+async function verifyTwoFA(){const code=Array.from(codeInputs).map(i=>i.value).join('');if(code.length!==6){showMessage('Enter a 6-digit code','error');return;}try{const r=await fetch(API_BASE+'/api/auth/verify-2fa',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code,tempToken:localStorage.getItem('tempLoginToken')})});const data=await r.json();if(r.ok){localStorage.setItem('authToken',data.token);localStorage.removeItem('tempLoginToken');showMessage('Verified! Redirecting...','success');setTimeout(()=>window.location.href='Main.html',1200);}else showMessage(data.message||'Invalid code','error');}catch(err){showMessage('Error verifying','error');}}
+
+// Signup form with loading state
+document.getElementById('signupForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('signupBtn');
+  const name=document.getElementById('signupName').value,email=document.getElementById('signupEmail').value,accountType=document.getElementById('accountType').value,password=document.getElementById('signupPassword').value,passwordConfirm=document.getElementById('signupPasswordConfirm').value,enable2FA=document.getElementById('enable2FA').checked;
+  if(password!==passwordConfirm){showMessage('Passwords do not match','error');return;}
+  if(password.length<8){showMessage('Password must be at least 8 characters','error');return;}
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Creating Account...';
+  try{const r=await fetch(API_BASE+'/api/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,accountType,password,enable2FA})});const data=await r.json();if(r.ok){localStorage.setItem('authToken',data.token);showMessage('Account created! Redirecting...','success');setTimeout(()=>window.location.href='Main.html',1200);}else showMessage(data.message||'Signup failed','error');}catch(err){showMessage('Error creating account','error');}
+  finally{btn.disabled=false; btn.textContent='Create Account';}
+});
+
+// Forgot Password Modal
+const forgotModal=document.getElementById('forgotPasswordModal');
+function showForgotPassword(){forgotModal.style.display='flex';}
+document.getElementById('forgotCloseBtn').addEventListener('click',function(){forgotModal.style.display='none';});
+window.addEventListener('click',function(e){if(e.target===forgotModal)forgotModal.style.display='none';});
+document.getElementById('forgotPasswordForm').addEventListener('submit',async function(e){
+  e.preventDefault();
+  const btn=document.getElementById('resetBtn');
+  const email=document.getElementById('resetEmail').value;
+  const msg=document.getElementById('forgotMessage');
+  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Sending...';
+  try{
+    const r=await fetch(API_BASE+'/api/auth/forgot-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+    const data=await r.json();
+    msg.textContent=data.message; msg.className='msg success';
+    if(data.resetLink) { msg.textContent+=' (Dev: '+data.resetLink+')'; }
+    setTimeout(()=>{forgotModal.style.display='none'; msg.className='msg';},4000);
+  }catch(err){msg.textContent='Error sending reset link'; msg.className='msg error';}
+  finally{btn.disabled=false; btn.textContent='Send Reset Link';}
+});
+
+// Password Visibility Toggle
+const passwordToggles=document.querySelectorAll('.password-toggle');
+passwordToggles.forEach(function(toggle){toggle.addEventListener('click',function(){const targetId=this.dataset.target;const input=document.getElementById(targetId);if(!input)return;const isPassword=input.type==='password';input.type=isPassword?'text':'password';const eyeIcon='<svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';const eyeOffIcon='<svg viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';this.innerHTML=isPassword?eyeOffIcon:eyeIcon;this.setAttribute('aria-label',isPassword?'Hide password':'Show password');});});
+const GOOGLE_CLIENT_ID='1051137117898-2mcu8n7q80rcn6veibai3kfoa4ghhtah.apps.googleusercontent.com';
+function renderGoogleButtons(){const isDark=html.classList.contains('dark-mode');['googleLoginBtn','googleSignupBtn'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.innerHTML='';google.accounts.id.renderButton(el,{type:'standard',theme:isDark?'filled_black':'outline',size:'large',width:280,text:id==='googleLoginBtn'?'signin_with':'signup_with'});});}
+async function handleGoogleCredential(response){try{const r=await fetch(API_BASE+'/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({credential:response.credential})});const data=await r.json();if(r.ok){localStorage.setItem('authToken',data.token);showMessage('Signed in with Google!','success');setTimeout(()=>window.location.href='Main.html',1200);}else showMessage(data.message||'Google sign-in failed','error');}catch(err){showMessage('Error connecting to server','error');}}
+const waitForGoogle=setInterval(()=>{if(window.google&&google.accounts){clearInterval(waitForGoogle);google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,callback:handleGoogleCredential});renderGoogleButtons();}},100);
+</script>
+</body>
+</html>
