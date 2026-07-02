@@ -82,9 +82,6 @@ app.use(express.static(path.join(__dirname, '..'), { index: 'Main.html' }));
 
 // ── CHATBOT ────────────────────────────────────────────────────────────
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-if (!GEMINI_API_KEY) {
-  console.warn('\n⚠️  GEMINI_API_KEY not set — /api/chat will not work.\n');
-}
 
 const SYSTEM_INSTRUCTION = `
 You are the "T Levels Assistant" chatbot on the Amazon T Levels Hub website.
@@ -95,15 +92,11 @@ You help students, parents, schools and advisors understand:
 - How students, parents, schools and advisors can each get involved
 
 Keep answers short, friendly and easy to read (2-4 sentences unless more detail is
-clearly needed). If someone asks something totally unrelated to T Levels, Amazon
+clearly needed. If someone asks something totally unrelated to T Levels, Amazon
 placements, or careers/education, politely steer the conversation back.
 `;
 
 app.post('/api/chat', async (req, res) => {
-  if (!GEMINI_API_KEY) {
-    return res.status(503).json({ error: 'Chatbot not configured — GEMINI_API_KEY missing.' });
-  }
-
   try {
     const { history } = req.body;
     if (!Array.isArray(history) || history.length === 0) {
@@ -134,7 +127,7 @@ app.post('/api/chat', async (req, res) => {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini API error:', geminiRes.status, errText);
-      return res.status(502).json({ error: 'Gemini API request failed' });
+      return res.status(502).json({ error: 'AI service temporarily unavailable. Please try again.' });
     }
 
     const data = await geminiRes.json();
